@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<title>CS 184 Final Project</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif; 
+  }
+  img, svg{
+    width: 100%;
+  } 
+  h1, h2 {font-weight:bolder;}
+  p {font-size:14pt;}
+  .row {width:90%; margin-left:5%;}
+</style>
+</head>
+
+<body>
+
+<div class="container" style="margin-top:50px;">
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <h1>Char</h1>
+      <h3 style="font-weight:normal;">Rendering Realistic, Physically-Based Fire</h3>
+      <h4 style="font-weight:normal;">CS184 Spring 2017 | Jiayi (Gary) Chen</h3>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:100px">
+    <div class="col-md-12">
+      <h2>Problem Description</h2> 
+      <p>The purpose of this project is to create realistic animations of low speed flames that are based on physical models. Fire is commonly found in many video games, movies, and other visual media. However, fire is difficult to control and can be dangerous due to its high energy content. As such, the simulation of fire is a highly demanded and applicable ability.<p> 
+      <p>Fire simulation has been a challenging in graphics. In part, this is due to its high computational cost. In the past, models have had to trade off realistic accuracy for speed. In addition, these models are not physically accurate and cannot be used in scientific studies.<p>
+      <p>To simulate fire, the project will use the methods presented in the University of Utah paper, "Physically-Based Realistic Fire Rendering" and the Stanford paper "Physically Based Modeling and Animation of Fire", both cited below. According to the papers, a fire can be described with three components: the fuel source, heated fuel mixed with air, and the hot gaseous product after combustion. To create a rendering of fire, a model of each of these components are created as well as the boundaries between these products. Then, blackbody radiation equations are used to model the emissions of the hot gasses. In addition, the fire is given a refractive index so that it will interact with the environment during raytracing.</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:50px;">
+    <div class="col-md-12">
+      <h2>Goals and Deliverables</h2>
+      <h3 style="font-weight:bolder;">Planned</h3>
+      <p>The minimum goal of this project is to render a still frame of a flame against a black background. After that is accomplished, it is hoped that the project will also be able to render an animation of a flame against a black background.</p>
+      <h3 style="font-weight:bolder;">Reach</h3>
+      <p>If time allows, the project will be developed to allow the flame to be rendered against an arbitrary background. This means incorporating it into a path tracer and integrating the various refracting effects. After that, functionality for interaction of the flame with other objects, both flammable and non-flammable, would be added.</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:50px;">
+    <div class="col-md-12">
+      <h2>Schedule</h2>
+      <h3 style="font-weight:bolder;">Week 1: Planning and Voxels</h3>
+      <p>Determine which models to use for the flame from the research papers.</p>
+      <p>Read up on voxels and level sets in OpenGL.</p>
+      <p>Set up the rendering system</p>
+      <h3 style="font-weight:bolder;">Week 2: Model</h3>
+      <p>Design framework(classes) for the fire model.</p>
+      <p>Create class and method definitions in C++.</p>
+      <p>Start, and hopefully finish, implementing methods</p>
+      <h3 style="font-weight:bolder;">Week 3: Rendering</h3>
+      <p>Integrate fire model into rendering system</p>
+      <p>Start rendering some images</p>
+      <h3 style="font-weight:bolder;">Week 3: Rendering</h3>
+      <p>Finish up code</p>
+      <p>Render more images/animations</p>
+      <p>Implement reach goals</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:50px; margin-bottom:80px;">
+    <div class="col-md-12">
+      <h2>Resources</h2>
+      <p>OpenGL: <a href="https://www.opengl.org/">https://www.opengl.org/</a></p>
+      <p>Nguyen, Duc Quang, Ronald Fedkiw, and Henrik Wann Jensen. "Physically based modeling and animation of fire." ACM Transactions on Graphics (TOG). Vol. 21. No. 3. ACM, 2002.</p>
+      <p>Pegoraro, Vincent, and Steven G. Parker. "Physically-Based Realistic Fire Rendering." NPH. 2006.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

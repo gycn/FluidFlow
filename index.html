@@ -33,8 +33,8 @@
 <div class="container" style="margin-top:50px;">
   <div class="row">
     <div class="col-md-12 text-center">
-      <h1>Char</h1>
-      <h3 style="font-weight:normal;">Rendering Realistic, Physically-Based Fire</h3>
+      <h1>FluidFlow</h1>
+      <h3 style="font-weight:normal;">Real-time Multiple Fluid Interaction Simulator</h3>
       <h4 style="font-weight:normal;">CS184 Spring 2017 | Jiayi (Gary) Chen, Kevin Munui</h3>
     </div>
   </div>
@@ -42,9 +42,11 @@
   <div class="row" style="margin-top:100px">
     <div class="col-md-12">
       <h2>Problem Description</h2> 
-      <p>The purpose of this project is to create realistic animations of low speed flames that are based on physical models. Fire is commonly found in many video games, movies, and other visual media. However, fire is difficult to control and can be dangerous due to its high energy content. As such, the simulation of fire is a highly demanded and applicable ability.<p> 
-      <p>Fire simulation has been a challenging in graphics. In part, this is due to its high computational cost. In the past, models have had to trade off realistic accuracy for speed. In addition, these models are not physically accurate and cannot be used in scientific studies.<p>
-      <p>To simulate fire, the project will use the methods presented in the University of Utah paper, "Physically-Based Realistic Fire Rendering" and the Stanford paper "Physically Based Modeling and Animation of Fire", both cited below. According to the papers, a fire can be described with three components: the fuel source, heated fuel mixed with air, and the hot gaseous product after combustion. To create a rendering of fire, a model of each of these components are created as well as the boundaries between these products. Then, blackbody radiation equations are used to model the emissions of the hot gasses. In addition, the fire is given a refractive index so that it will interact with the environment during raytracing.</p>
+      <p>The goal for this project is to create a real-time fluid simulator that can handle interactions of multiple liquids as well as interactions of matter in different states. Such simulations are very highly demanded in video games for generating realistic environmental effects that respond to user interaction. They also have applicability to scientific studies of fluid interaction.</p>
+
+      <p>Such simulators are difficult to create due to the computational complexity involved in the simulating fluid physics. Generally, such simulators are either physically inaccurate or cannot be rendered in real-time. Furthermore, objects of different states or densities are usually simulated with different models, rendering it difficult to calculate the interactions between the two objects.</p>
+
+      <p>This project will solve the aforementioned problems by following the methods proposed in the paper “Unified Particle Physics for Real-Time Applications”, cited below. The paper proposes creating a particle simulator for all types of matter, no matter the state or the density, and simulating interactions between the particles to create realistic interactions between objects. Fluids of different densities simply have different sets of constraints between their particles. In addition, corrective factors are added for solid matter to ensure that solid objects retain their shapes. By making all objects in the scene out of the same particles, the engine is able to seamlessly and efficiently simulate interactions in the environment.</p>
     </div>
   </div>
 
@@ -52,29 +54,34 @@
     <div class="col-md-12">
       <h2>Goals and Deliverables</h2>
       <h3 style="font-weight:bolder;">Planned</h3>
-      <p>The minimum goal of this project is to render a still frame of a flame against a black background. After that is accomplished, it is hoped that the project will also be able to render an animation of a flame against a black background.</p>
+      <p>The main goal behind this project is to show how two fluids with different densities would interact. More specifically, it is to closely simulate the Rayleigh-Taylor instability. The primary fluids being used are water and oil. These simulations will happen with earth’s gravitational field. The interaction of the fluids in will be simulated using the position-based fluids method [Macklin and Muller 2013]. The final result would look similar to the picture below.</p>
+      <img src="fluids.png">
       <h3 style="font-weight:bolder;">Reach</h3>
-      <p>If time allows, the project will be developed to allow the flame to be rendered against an arbitrary background. This means incorporating it into a path tracer and integrating the various refracting effects. After that, functionality for interaction of the flame with other objects, both flammable and non-flammable, would be added.</p>
+      <p>On achieving this goal, the gravitational force will be varied to demonstrate how the different fluids would interact on planets of different masses. For example, a scene could be rendered showing the interaction in the moon’s gravitational field.</p>
+      <img src="balls.png">
+      <p>Afterwards, support for interaction between fluids and solid objects would be implemented. The densities of the solid objects would be varied, allowing for a demonstration of buoyancy forces, creating an interaction similar to the picture below.</p>
     </div>
   </div>
 
   <div class="row" style="margin-top:50px;">
     <div class="col-md-12">
       <h2>Schedule</h2>
-      <h3 style="font-weight:bolder;">Week 1: Planning and Voxels</h3>
-      <p>Determine which models to use for the flame from the research papers.</p>
-      <p>Read up on voxels and level sets in OpenGL.</p>
-      <p>Set up the rendering system</p>
-      <h3 style="font-weight:bolder;">Week 2: Model</h3>
-      <p>Design framework(classes) for the fire model.</p>
-      <p>Create class and method definitions in C++.</p>
-      <p>Start, and hopefully finish, implementing methods</p>
-      <h3 style="font-weight:bolder;">Week 3: Rendering</h3>
-      <p>Integrate fire model into rendering system</p>
-      <p>Start rendering some images</p>
+      <h3 style="font-weight:bolder;">Week 1: Planning and OpenGL</h3>
+      <p>Understand research papers and finalize mathematical model for the project.</p>
+      <p>Design framework for the project.</p>
+      <p>Learn how to use OpenGL</p>
+      <p>Write up class and method definitions in C++</p>
+      <h3 style="font-weight:bolder;">Week 2: Initial Coding</h3>
+      <p>Start implementing constraint solvers and update functions for particles</p>
+      <p>Get rendering working with particles represented as spheres</p>
+      <p>Render basic single fluid simulations for midpoint</p>
+      <h3 style="font-weight:bolder;">Week 3: Finalize Code</h3>
+      <p>Finish particle simulator physics</p>
+      <p>Get rendering working with liquid appearance</p>
+      <p>Render some simple single and double fluid simulations for testing</p>
       <h3 style="font-weight:bolder;">Week 4: Final Touches and Debugging</h3>
-      <p>Finish up code</p>
-      <p>Render more images/animations</p>
+      <p>Render demos for final write-up</p>
+      <p>Implement GUI</p>
       <p>Implement reach goals</p>
     </div>
   </div>
@@ -83,8 +90,9 @@
     <div class="col-md-12">
       <h2>Resources</h2>
       <p>OpenGL: <a href="https://www.opengl.org/">https://www.opengl.org/</a></p>
-      <p>Nguyen, Duc Quang, Ronald Fedkiw, and Henrik Wann Jensen. "Physically based modeling and animation of fire." ACM Transactions on Graphics (TOG). Vol. 21. No. 3. ACM, 2002.</p>
-      <p>Pegoraro, Vincent, and Steven G. Parker. "Physically-Based Realistic Fire Rendering." NPH. 2006.</p>
+      <p>Macklin, Miles, and Matthias Müller. "Position based fluids." ACM Transactions on Graphics (TOG) 32.4 (2013): 104.</p>
+      <p>Macklin, Miles, et al. "Unified particle physics for real-time applications." ACM Transactions on Graphics (TOG) 33.4 (2014): 153.</p>
+      <p>Akinci, Nadir, et al. "Versatile rigid-fluid coupling for incompressible SPH." ACM Transactions on Graphics (TOG) 31.4 (2012): 62.</p>
     </div>
   </div>
 </div>

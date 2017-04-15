@@ -47,15 +47,8 @@ if(APPLE)
 
 endif(APPLE)
 
-#GLFW
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(path/to/glfw)
-target_link_libraries(FluidFlow glfw)
-
 #project includes
-include_directories(include)
+include_directories(inc)
 
 #project sources
 file(GLOB SOURCES "src/*.cpp")

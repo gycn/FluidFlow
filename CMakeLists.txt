@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.7)
 project(FluidFlow)
 
 #project includes
@@ -16,3 +16,6 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw)
 target_link_libraries(fluidflow glfw)
 
+#OpenCL
+find_package(OpenCL REQUIRED)
+target_link_libraries(fluidflow OpenCL::OpenCL)

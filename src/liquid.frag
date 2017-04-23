@@ -13,8 +13,7 @@ uniform vec3 highlight_color;
 uniform vec3 lightdir;
 uniform vec2 screenSize;
 
-vec3 ks = vec3(0.1f, 0.1f, 0.1f);
-vec3 lightdir = vec3(0, 0, -1.0f);
+out vec4 color;
 
 float fresnel(float costhetai, float n1, float n2) {
   float costhetai2 = costhetai * costhetai;
@@ -34,55 +33,63 @@ float fresnel(float costhetai, float n1, float n2) {
   return 0.5f * (Rs + Rp);
 }
 
-float a(vec3 fluidcolor, vec3 scenecolor, float thickness) {
+vec3 a(vec3 fluidcolor, vec3 scenecolor, float thickness) {
   float t = exp(-thickness);
   return (1.0f - t) * fluidcolor + t * scenecolor;
 }
 
-vec3 normal(float z) {
-
-  float Cx = 1.0f / screenSize.x / -projection[0][0];
-  float Cy = 1.0f / screenSize.y / -projection[1][1];
-
+vec3 normal(vec2 pos) {
+	float z = texture(surface, pos).r;
+	
   vec2 dx = vec2(1.0f / screenSize.x, 0.0f);
   vec2 dy = vec2(0.0f, 1.0f / screenSize.y);
 	
-	//First Order Finite Differences
- 	float zdxp = texture(particleTexture, pos + dx);
-	float zdxn = texture(particleTexture, pos - dx);
-	float zdx = (zdxp == 0.0f) ? (zdxn == 0.0f ? 0.0f : (zc - zdxn)) : (zdxp - zc);
+  float invFx = 2.0f / projection[0][0];		
+  float invFy = 2.0f / projection[1][1];
 
-	float zdyp = texture(particleTexture, pos + dy);
-	float zdyn = texture(particleTexture, pos - dy);
-	float zdy = (zdyp == 0.0f) ? (zdyn == 0.0f ? 0.0f : (zc - zdyn)) : (zdyp - zc); 
+  float dzdxp = texture(surface, pos + dx).r;
+  float dzdxn = texture(surface, pos - dx).r;
+  float dzdx = (dzdxp == 0.0f) ? (dzdxn == 0.0f ? 0.0f : (z - dzdxn)) : (dzdxp - z);
 
-	float D = Cy * Cy * zdx * zdx + Cx * Cx * zdy * zdy + Cx * Cx * Cy * Cy * z * z;
-	
-	return vec3(-Cy * zdx, -Cx * zdy, Cx * Cy * z) / pow(D, 0.5f);
+  float dzdyp = texture(surface, pos + dy).r;
+  float dzdyn = texture(surface, pos - dy).r;
+  float dzdy = (dzdyp == 0.0f) ? (dzdyn == 0.0f ? 0.0f : (z - dzdyn)) : (dzdyp - z);
+  
+  float invFx2 = invFx * invFx;
+  float invFy2 = invFy * invFy;
+
+  vec3 unnormalized = vec3(-invFy * dzdx, -invFx * dzdy, z * invFy * invFx);
+
+  float len = pow(invFy2 * dzdx * dzdx + invFx2 * dzdy * dzdy + z * z * invFx2 * invFy2, 0.5f);
+
+  return unnormalized / len;
 }
 
 void main() {
   float depth = texture(surface, coords).r;
-  vec3 eyespacePos(((2.0f * coords.x) - 1.0) / (0.5f * projection[0][0]),
-                   ((2.0f * coords.y) - 1.0) / (0.5f * projection[1][1]),
-                   1.0f);
+  //vec3 eyespacePos(((2.0f * coords.x) - 1.0) / (0.5f * projection[0][0]), ((2.0f * coords.y) - 1.0) / (0.5f * projection[1][1]), 1.0f);
+  float Wx = (2.0f * coords.x - 1.0f) / (0.5f * projection[0][0]);
+  float Wy = (2.0f * coords.y - 1.0f) / (0.5f * projection[0][0]);
+  vec3 eyespacePos = vec3(Wx, Wy, 1.0f);
   eyespacePos *= depth;
- 	
+  eyespacePos = normalize(eyespacePos);
 
-	vec3 n = normal(depth);
+	vec3 n = normal(coords);
 	
-  float normalcameraangle = dot(n, -eyespacePos);
-  
   vec3 worldCameraVec = (inverse(modelview) * vec4(-eyespacePos, 1.0f)).xyz;
-  vec3 worldnormal = (inverse(modelview) * vec4(normal, 1.0f)).xyz;
+  vec3 worldnormal = (inverse(modelview) * vec4(n, 1.0f)).xyz;
+
+  float normalcameraangle = dot(worldnormal, worldCameraVec);
 
   vec3 h = 0.5f * (worldCameraVec + lightdir);
   
   float normalhangle = dot(h, worldnormal);
 
   float thickness = texture(thickness, coords).r;
-
-  return a(fluid_color, vec3(0, 0, 0), thickness) * (1.0f - fresnel(normalcameraangle, 1.0f, 1.5f)) 
-       + highlight_color * pow(normalhangle, 3.0f);
+  
+  vec3 colorxyz =a(fluid_color, vec3(0.05f), thickness) * (1.0f - fresnel(normalcameraangle, 1.0f, 1.5f)) + highlight_color * pow(normalhangle, 3.0f); 
+  color = vec4(colorxyz, 1.0f);
+  //color = vec4(normalcameraangle, 0, 0, 1.0f);
+  //color = vec4(thickness, 0, 0, 1.0f);
 }
 

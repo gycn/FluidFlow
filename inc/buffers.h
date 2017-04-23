@@ -22,6 +22,7 @@ struct ScreenQuadBuffer {
 struct ThicknessBuffer {
   GLuint texture;
   GLuint frame_buffer;
+  GLuint render_buffer;
   int width, height;
 };
 

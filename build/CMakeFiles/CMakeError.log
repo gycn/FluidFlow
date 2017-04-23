@@ -1,0 +1,29 @@
+Determining if the CL_VERSION_2_0 exist failed with the following output:
+Change Dir: /Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_a4868/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_a4868.dir/build.make CMakeFiles/cmTC_a4868.dir/build
+Building C object CMakeFiles/cmTC_a4868.dir/CheckSymbolExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_a4868.dir/CheckSymbolExists.c.o   -c /Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: error: use of undeclared identifier 'CL_VERSION_2_0'
+  return ((int*)(&CL_VERSION_2_0))[argc];
+                  ^
+1 error generated.
+make[1]: *** [CMakeFiles/cmTC_a4868.dir/CheckSymbolExists.c.o] Error 1
+make: *** [cmTC_a4868/fast] Error 2
+
+File /Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include </System/Library/Frameworks/OpenCL.framework/Headers/cl.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef CL_VERSION_2_0
+  return ((int*)(&CL_VERSION_2_0))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+

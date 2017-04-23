@@ -497,3 +497,29 @@ int main(int argc, char** argv)
 #endif
 }
 
+Determining if the CL_VERSION_1_2 exist passed with the following output:
+Change Dir: /Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_06f3a/fast"
+/Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_06f3a.dir/build.make CMakeFiles/cmTC_06f3a.dir/build
+Building C object CMakeFiles/cmTC_06f3a.dir/CheckSymbolExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc     -o CMakeFiles/cmTC_06f3a.dir/CheckSymbolExists.c.o   -c /Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_06f3a
+/usr/local/Cellar/cmake/3.7.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_06f3a.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc    -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_06f3a.dir/CheckSymbolExists.c.o  -o cmTC_06f3a 
+
+File /Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include </System/Library/Frameworks/OpenCL.framework/Headers/cl.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef CL_VERSION_1_2
+  return ((int*)(&CL_VERSION_1_2))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+

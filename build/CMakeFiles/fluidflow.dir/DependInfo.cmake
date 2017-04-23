@@ -7,26 +7,28 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "/Users/garychen/Documents/CS184/FluidFlow/src/glad.c" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/glad.c.o"
   )
-set(CMAKE_C_COMPILER_ID "Clang")
+set(CMAKE_C_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
   "../inc"
   "../glm"
   "../glfw/include"
+  "/System/Library/Frameworks/OpenCL.framework"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/garychen/Documents/CS184/FluidFlow/src/GLShader.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/GLShader.cpp.o"
   "/Users/garychen/Documents/CS184/FluidFlow/src/camera.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/camera.cpp.o"
   "/Users/garychen/Documents/CS184/FluidFlow/src/main.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/main.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "Clang")
+set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../inc"
   "../glm"
   "../glfw/include"
+  "/System/Library/Frameworks/OpenCL.framework"
   )
 
 # Targets to which this target links.

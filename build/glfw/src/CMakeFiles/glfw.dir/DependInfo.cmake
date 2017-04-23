@@ -18,7 +18,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/Users/garychen/Documents/CS184/FluidFlow/glfw/src/vulkan.c" "/Users/garychen/Documents/CS184/FluidFlow/build/glfw/src/CMakeFiles/glfw.dir/vulkan.c.o"
   "/Users/garychen/Documents/CS184/FluidFlow/glfw/src/window.c" "/Users/garychen/Documents/CS184/FluidFlow/build/glfw/src/CMakeFiles/glfw.dir/window.c.o"
   )
-set(CMAKE_C_COMPILER_ID "Clang")
+set(CMAKE_C_COMPILER_ID "AppleClang")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_C

@@ -238,6 +238,12 @@ IOKIT_FRAMEWORK:FILEPATH=/System/Library/Frameworks/IOKit.framework
 LIB_SUFFIX:STRING=
 
 //Path to a file.
+OpenCL_INCLUDE_DIR:PATH=/System/Library/Frameworks/OpenCL.framework
+
+//Path to a library.
+OpenCL_LIBRARY:FILEPATH=/System/Library/Frameworks/OpenCL.framework
+
+//Path to a file.
 VULKAN_INCLUDE_DIR:PATH=VULKAN_INCLUDE_DIR-NOTFOUND
 
 //Path to a library.
@@ -388,10 +394,20 @@ COCOA_FRAMEWORK-ADVANCED:INTERNAL=1
 CORE_FOUNDATION_FRAMEWORK-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CORE_VIDEO_FRAMEWORK
 CORE_VIDEO_FRAMEWORK-ADVANCED:INTERNAL=1
+//Details about finding OpenCL
+FIND_PACKAGE_MESSAGE_DETAILS_OpenCL:INTERNAL=[/System/Library/Frameworks/OpenCL.framework][/System/Library/Frameworks/OpenCL.framework][v1.2()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: IOKIT_FRAMEWORK
 IOKIT_FRAMEWORK-ADVANCED:INTERNAL=1
+//Have symbol CL_VERSION_1_2
+OPENCL_VERSION_1_2:INTERNAL=1
+//Have symbol CL_VERSION_2_0
+OPENCL_VERSION_2_0:INTERNAL=
+//ADVANCED property for variable: OpenCL_INCLUDE_DIR
+OpenCL_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenCL_LIBRARY
+OpenCL_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: VULKAN_INCLUDE_DIR
 VULKAN_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: VULKAN_LIBRARY

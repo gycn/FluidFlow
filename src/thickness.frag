@@ -16,11 +16,11 @@ void main() {
   float dist = dot(normal.xy, normal.xy);
   
   // Outside sphere? Discard.
-  if(dist > 1.0f) {
+  if(dist > 0.7f) {
     discard;
   }
 	
-	particle_width = 1 - length(normal);
+	particle_width = 1.0f - length(normal);
 
 	// Calculate fragment position in eye space, project to find depth
 	vec4 fragPos = vec4(eyespacePos + normal * eyespaceRadius / screenSize.y, 1.0);

@@ -1,1 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/c++    -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/test.dir/src/GLShader.cpp.o CMakeFiles/test.dir/src/camera.cpp.o CMakeFiles/test.dir/src/main.cpp.o CMakeFiles/test.dir/src/glad.c.o  -o test  glfw/src/libglfw3.a -framework Cocoa -framework IOKit -framework CoreFoundation -framework CoreVideo 

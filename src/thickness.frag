@@ -16,7 +16,7 @@ void main() {
   float dist = dot(normal.xy, normal.xy);
   
   // Outside sphere? Discard.
-  if(dist > 0.7f) {
+  if(dist > 1.0f) {
     discard;
   }
 	

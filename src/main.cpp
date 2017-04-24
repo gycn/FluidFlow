@@ -13,6 +13,13 @@
 #include "shaders.h"
 #include "GLShader.hpp"
 #include "camera.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <iterator>
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 bool pressed = false;
@@ -21,8 +28,9 @@ float spacing = 0.1f;
 int smoothing_iterations = 40; 
 cl_int cl_err;
 
-GLfloat vertices[8000];
-GLuint vertex_indices[8000];
+GLfloat vertices[3000];
+GLfloat previous[3000];
+GLuint vertex_indices[1000];
 
 GLFWwindow* window;
 Camera camera(glm::vec3(0.0f,1.0f, 2.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0), WIDTH, HEIGHT);
@@ -126,18 +134,6 @@ int main()
   cl::Context context(CL_DEVICE_TYPE_CPU, cprops, NULL, NULL, &err);
   checkCLErr(err, "Context::Context()"); 
   
-  //CL test
-  std::string hw("Hello World\n");
-
-  char * outH = new char[hw.length()+1];
-  cl::Buffer outCL(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, hw.length()+1, outH, &err);
-  checkCLErr(err, "Buffer::Buffer()");
-
-
-  cl::vector<cl::Device> devices;
-  devices = context.getInfo<CL_CONTEXT_DEVICES>();
-  checkErr(devices.size() > 0 ? CL_SUCCESS : -1, "devices.size() > 0");
-
   //Init OpenGL objects 
   init();
 

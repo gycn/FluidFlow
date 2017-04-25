@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+<title>CS 184 Final Project</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif; 
+  }
+  img, svg{
+    width: 100%;
+  } 
+  h1, h2 {font-weight:bolder;}
+  p {font-size:14pt;}
+  .row {width:90%; margin-left:5%;}
+</style>
+</head>
+
+<body>
+
+
+<div class="container" style="margin-top:50px;">
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded" style="margin-bottom:60px">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">FluidFlow</a>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="index.html">Proposal<span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link active" href="milestone.cpp">Milestone</a>
+    </div>
+  </div>
+</nav>
+
+  <div class="row"  style="margin-bottom:25px;">
+    <div class="col-md-12" style="margin-bottom:10px;">
+      <h2>Current Progress</h2>
+      <h5>April 25, 2017</h5>
+    </div>
+
+    <div class="col-md-7" style="margin-top:20px;">
+      <h4 style="font-weight:bold">Rendering</h4>
+      <p>The image on the right is the amount of progress that we have made on our fluid renderer so far. All of the code was written in C++ on the OpenGL pipeline.</p>  <p>As seen, the rendering almost resembles a real liquid. However, there are still artificats and the spherical shapes have not been completely eliminated.</p>
+    </div>
+    <div class="col-md-5">
+      <img src="images/milestone/liquid_120.png">
+    </div>
+    <div class="col-md-12">
+      <p>Below, we give more details on the process of rendering the fluids. </p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom: 20px;">
+    <div class="col-md-12">
+      <h5 style="font-weight:bold">Point Sprites</h5>
+    </div>
+    <div class="col-md-3">
+        <img src="images/milestone/point_sprites.png">
+        <p style="font-size:11pt;">An image representation of the point sprites</p>
+    </div>
+    <div class="col-md-3">
+        <img src="images/milestone/surface_1.png">
+        <p style="font-size:11pt;">An image of the representation of the depth map. Brighter colors represent points that are farther away.</p>
+    </div>
+    <div class="col-md-6">
+      <p>The particles are first rendered as point sprites. This means that only R3 vectors representing the particles' positions are passed to the vertex shader. The fragment shaders then receive a square set of vertices centered about that point. Vertices outside of a circle are discarded and the depths of the sphere at those positions are computed. Then, only the depths are retained, creating a depth map of the surface of the fluid that is visible to the camera.</p>
+    </div>
+  </div>
+  
+  <div class="row" style="margin-bottom:20px">
+    <div class="col-md-12">
+      <h5 style="font-weight:bold">Curvature Smoothing</h5>
+    </div>
+    <div class="col-md-6">
+      <p>Next, the curvature of the depth map is smoothed, meaning that the rapid changes in depth due to the spherical representation of the particles are lessened. This is done by calculating derivatives at each point and applying a smoothing step repeatedly. On the right, you can see the results of the surface smoothing. The colors represent the surface normals at each point.</p>
+    </div>
+    <div class="col-md-3">
+        <img src="images/milestone/normals_1.png">
+        <p style="font-size:11pt;">No smoothing iterations.</p>
+    </div>
+    <div class="col-md-3">
+        <img src="images/milestone/normals_120.png">
+        <p style="font-size:11pt;">After 120 smoothing iterations.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h5 style="font-weight:bold">Thickness</h5>
+    </div>
+    <div class="col-md-4">
+        <img src="images/milestone/thickness.png">
+        <p style="font-size:11pt;">Brighter colors are thicker regions.</p>
+    </div>
+    <div class="col-md-8">
+      <p>The last preprocessing step is calculating thickness. Imagine lines perpendicular to the camera plane extending from each pixel into the scene. The thickness is the summed width of the particles that each line intersects. The width varies depending on where the particle is intersected. This is needed to calculate how much of the background should be refracted through the fluid.</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:20px;">
+    <div class="col-md-12">
+      <h5 style="font-weight:bold">Final Step</h5>
+      <p> The final step is to render a quad on the screen. In the fragment shader, each fragment computes the following equation to obtain its color.</p>
+    </div>
+    <div class=" col-offset-md-3 col-md-6">
+      <img src="images/rendering_equation.png">
+    </div>
+    <br>
+    <br>
+    <div class="col-md-12">
+     <p>F is the Fresnel function, a is the refracted fluid color, b is
+     the reflected scene color, ks and &alpha; are constants for the specular
+     highlight, n is the surface normal and h is the half-angle between
+     the camera and the light, and v is the camera vector.</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:20px;">
+    <div class="col-md-12">
+      <h4 style="font-weight:bold;">Simulation</h4>
+    </div>
+    <div class="col-md-8">
+      <p>Unfortunately, we have not made much progress on the actual simulation of the particles. Currently, we have been able to link OpenCL with OpenGL and get gravity working, as seen on the right. We have also written some code for enforcing incompressibility (which will be shown in the video), but it is still buggy.</p>
+    </div>
+   <div class="col-md-4">
+    <video width="221" height="360" autoplay loop style="padding-bottom:120px">
+      <source src="images/milestone/gravity_demo.mov" type="video/mp4">
+    </video>
+   </div>
+  </div>
+
+  <div class="row" style="margin-top:-50px; margin-bottom:120px;">
+    <div class="col-md-12">
+      <h2>Thoughts and Updates</h2>
+    </div>
+    <div class="col-md-12">
+      <p>We are definitely behind schedule. We had planned to have a working particle simulation for one fluid by now as well as a working basic renderer. We don't have either right now. As a result, we are going to have to skip some things that we had wanted to include. Currently, we are planning not to integrate the particle anisotropy calculation and instead rely on curvature smoothing. In addition, we will probably not implement interaction between fluids and solids.</p>
+      <p>Our goals for this week are to finish up debugging the renderer and get the particle simulation working with a single fluid. Next week, we will include additional liquids.</p>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <h2>Video Overview</h3>
+    <video width="640" height="400" controls>
+      <source src="images/milestone/video.mp4" type="video/mp4">
+    </video>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:30px;margin-bottom:50px;">
+    <div class="col-md-12 text-center">
+      <h3>Slides giving an overview of the project can be found <a href="https://docs.google.com/presentation/d/1oQh7cit-GprhBtPv8hi3jjqBrH3QKnw-Mlz1Uu8Vg1I/edit?usp=sharing">here</a>.</h3>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

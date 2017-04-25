@@ -1,5 +1,5 @@
 #version 330
-in vec3 pos;
+in vec4 pos;
 
 out vec3 eyespacePos;
 out float eyespaceRadius;
@@ -8,12 +8,12 @@ uniform mat4 modelview;
 uniform mat4 projection;
 uniform vec2 screenSize;
 
-float radius = 0.08f;
+float radius = 0.6f;
 
 void main() {
   vec4 test_point = vec4(pos.xyz, 1.0f) + vec4(0, radius, 0, 0);
   test_point = modelview * test_point;
-	vec4 eyespacePos4 = modelview * vec4(pos.xyz, 1.0f);
+	vec4 eyespacePos4 = modelview * pos;
 
 	eyespacePos = eyespacePos4.xyz;
 	eyespaceRadius = length(test_point - eyespacePos4);

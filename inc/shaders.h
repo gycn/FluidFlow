@@ -45,5 +45,11 @@ struct LiquidShader {
   GLint fluid_color_location;
   GLint highlight_color_location;
   GLint lightdir_location;
+  GLint background_location;
 };
+ParticleShader particle_shader;
+DepthShader depth_shader;
+SmoothingShader smoothing_shader;
+ThicknessShader thickness_shader;
+LiquidShader liquid_shader;
 #endif

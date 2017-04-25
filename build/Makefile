@@ -274,6 +274,33 @@ src/glad.c.s:
 	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/glad.c.s
 .PHONY : src/glad.c.s
 
+src/lodepng.o: src/lodepng.cpp.o
+
+.PHONY : src/lodepng.o
+
+# target to build an object file
+src/lodepng.cpp.o:
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/lodepng.cpp.o
+.PHONY : src/lodepng.cpp.o
+
+src/lodepng.i: src/lodepng.cpp.i
+
+.PHONY : src/lodepng.i
+
+# target to preprocess a source file
+src/lodepng.cpp.i:
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/lodepng.cpp.i
+.PHONY : src/lodepng.cpp.i
+
+src/lodepng.s: src/lodepng.cpp.s
+
+.PHONY : src/lodepng.s
+
+# target to generate assembly for a file
+src/lodepng.cpp.s:
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/lodepng.cpp.s
+.PHONY : src/lodepng.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -325,6 +352,9 @@ help:
 	@echo "... src/glad.o"
 	@echo "... src/glad.i"
 	@echo "... src/glad.s"
+	@echo "... src/lodepng.o"
+	@echo "... src/lodepng.i"
+	@echo "... src/lodepng.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

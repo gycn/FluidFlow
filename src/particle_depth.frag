@@ -31,7 +31,7 @@ void main() {
 
 	// Set up rest of normal
 	normal.z = sqrt(1.0f - dist);
-	normal.y = -normal.y;
+	normal.y = normal.y;
 	normal = normalize(normal);
 
 	// Calculate fragment position in eye space, project to find depth
@@ -48,5 +48,5 @@ void main() {
 	//if(fragDepth > texture(terrainTexture, gl_FragCoord.xy / screenSize).w) {
 	//	discard;
 	//}
-	particleDepth = clipspacePos.z ; // / clipspacePos.w;
+	particleDepth = clipspacePos.z;//  / clipspacePos.w;
 }

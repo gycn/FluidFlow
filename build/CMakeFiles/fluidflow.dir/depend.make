@@ -118,6 +118,9 @@ CMakeFiles/fluidflow.dir/src/camera.cpp.o: ../glm/vector_relational.hpp
 CMakeFiles/fluidflow.dir/src/camera.cpp.o: ../inc/camera.h
 CMakeFiles/fluidflow.dir/src/camera.cpp.o: ../src/camera.cpp
 
+CMakeFiles/fluidflow.dir/src/lodepng.cpp.o: ../inc/lodepng.h
+CMakeFiles/fluidflow.dir/src/lodepng.cpp.o: ../src/lodepng.cpp
+
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../glfw/include/GLFW/glfw3.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../glm/common.hpp
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../glm/detail/_fixes.hpp
@@ -228,8 +231,10 @@ CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/GLShader.hpp
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/buffers.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/camera.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/cl.hpp
+CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/fluid_simulation.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/glad.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/khrplatform.h
+CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/lodepng.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../inc/shaders.h
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../src/main.cpp
 

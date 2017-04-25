@@ -19,6 +19,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
 set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/garychen/Documents/CS184/FluidFlow/src/GLShader.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/GLShader.cpp.o"
   "/Users/garychen/Documents/CS184/FluidFlow/src/camera.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/camera.cpp.o"
+  "/Users/garychen/Documents/CS184/FluidFlow/src/lodepng.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/lodepng.cpp.o"
   "/Users/garychen/Documents/CS184/FluidFlow/src/main.cpp" "/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles/fluidflow.dir/src/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")

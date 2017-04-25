@@ -19,3 +19,8 @@ target_link_libraries(fluidflow glfw)
 #OpenCL
 find_package(OpenCL REQUIRED)
 target_link_libraries(fluidflow OpenCL::OpenCL)
+
+#OpenGL
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
+target_link_libraries(fluidflow ${OPENGL_LIBRARIES})

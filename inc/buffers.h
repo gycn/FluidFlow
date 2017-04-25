@@ -35,4 +35,9 @@ GLfloat screen_quad_vertices[] = {
 
 GLuint screen_quad_indices[] = {0, 1, 3, 1, 2, 3};
 
+VertexBuffer vertex_buffer;
+DepthBuffer depth_buffer;
+ScreenQuadBuffer screen_quad_buffer;
+ThicknessBuffer thickness_buffer;
+
 #endif

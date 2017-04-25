@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+<title>CS 184 Final Project</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif; 
+  }
+  img, svg{
+    width: 100%;
+  } 
+  h1, h2 {font-weight:bolder;}
+  p {font-size:14pt;}
+  .row {width:90%; margin-left:5%;}
+</style>
+</head>
+
+<body>
+
+
+<div class="container" style="margin-top:50px;">
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded" style="margin-bottom:100px">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">FluidFlow</a>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link active" href="#">Proposal<span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link" href="milestone.html">Milestone</a>
+    </div>
+  </div>
+</nav>
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <h1>FluidFlow</h1>
+      <h3 style="font-weight:normal;">Real-time Multiple Fluid Interaction Simulator</h3>
+      <h4 style="font-weight:normal;">CS184 Spring 2017 | Jiayi (Gary) Chen, Kevin Munui</h3>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:100px">
+    <div class="col-md-12">
+      <h2>Problem Description</h2> 
+      <p>The goal for this project is to create a real-time fluid simulator that can handle interactions of multiple liquids as well as interactions of matter in different states. Such simulations are very highly demanded in video games for generating realistic environmental effects that respond to user interaction. They also have applicability to scientific studies of fluid interaction.</p>
+
+      <p>Such simulators are difficult to create due to the computational complexity involved in the simulating fluid physics. Generally, such simulators are either physically inaccurate or cannot be rendered in real-time. Furthermore, objects of different states or densities are usually simulated with different models, rendering it difficult to calculate the interactions between the two objects.</p>
+
+      <p>This project will solve the aforementioned problems by following the methods proposed in the paper “Unified Particle Physics for Real-Time Applications”, cited below. The paper proposes creating a particle simulator for all types of matter, no matter the state or the density, and simulating interactions between the particles to create realistic interactions between objects. Fluids of different densities simply have different sets of constraints between their particles. In addition, corrective factors are added for solid matter to ensure that solid objects retain their shapes. By making all objects in the scene out of the same particles, the engine is able to seamlessly and efficiently simulate interactions in the environment.</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:50px;">
+    <div class="col-md-12">
+      <h2>Goals and Deliverables</h2>
+      <h3 style="font-weight:bolder;">Planned</h3>
+      <p>The main goal behind this project is to show how two fluids with different densities would interact. More specifically, it is to closely simulate the Rayleigh-Taylor instability. The primary fluids being used are water and oil. These simulations will happen with earth’s gravitational field. The interaction of the fluids in will be simulated using the position-based fluids method [Macklin and Muller 2013]. The final result would look similar to the picture below.</p>
+      <img src="images/fluids.png">
+      <h3 style="font-weight:bolder;">Reach</h3>
+      <p>On achieving this goal, the gravitational force will be varied to demonstrate how the different fluids would interact on planets of different masses. For example, a scene could be rendered showing the interaction in the moon’s gravitational field.</p>
+      <img src="images/balls.png">
+      <p>Afterwards, support for interaction between fluids and solid objects would be implemented. The densities of the solid objects would be varied, allowing for a demonstration of buoyancy forces, creating an interaction similar to the picture below.</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:50px;">
+    <div class="col-md-12">
+      <h2>Schedule</h2>
+      <h3 style="font-weight:bolder;">Week 1: Planning and OpenGL</h3>
+      <p>Understand research papers and finalize mathematical model for the project.</p>
+      <p>Design framework for the project.</p>
+      <p>Learn how to use OpenGL</p>
+      <p>Write up class and method definitions in C++</p>
+      <h3 style="font-weight:bolder;">Week 2: Initial Coding</h3>
+      <p>Start implementing constraint solvers and update functions for particles</p>
+      <p>Get rendering working with particles represented as spheres</p>
+      <p>Render basic single fluid simulations for midpoint</p>
+      <h3 style="font-weight:bolder;">Week 3: Finalize Code</h3>
+      <p>Finish particle simulator physics</p>
+      <p>Get rendering working with liquid appearance</p>
+      <p>Render some simple single and double fluid simulations for testing</p>
+      <h3 style="font-weight:bolder;">Week 4: Final Touches and Debugging</h3>
+      <p>Render demos for final write-up</p>
+      <p>Implement GUI</p>
+      <p>Implement reach goals</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:50px; margin-bottom:80px;">
+    <div class="col-md-12">
+      <h2>Resources</h2>
+      <p>OpenGL: <a href="https://www.opengl.org/">https://www.opengl.org/</a></p>
+      <p>Macklin, Miles, and Matthias Müller. "Position based fluids." ACM Transactions on Graphics (TOG) 32.4 (2013): 104.</p>
+      <p>Macklin, Miles, et al. "Unified particle physics for real-time applications." ACM Transactions on Graphics (TOG) 33.4 (2014): 153.</p>
+      <p>Akinci, Nadir, et al. "Versatile rigid-fluid coupling for incompressible SPH." ACM Transactions on Graphics (TOG) 31.4 (2012): 62.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

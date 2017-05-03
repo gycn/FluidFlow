@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include <OpenCL/cl.h>
-#include <cl.hpp>
+#include <OpenCL/cl.hpp>
 #include <OpenCL/cl_gl.h>
 
 #include <glad.h>
@@ -32,7 +32,7 @@
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 bool pressed = false;
-int smoothing_iterations = 1; 
+int smoothing_iterations = 80; 
 GLuint background;
 
 FluidSimulation fluid_simulation;
@@ -90,7 +90,7 @@ int main()
   {
     glfwPollEvents();
     update_mouse_events();
-    //fluid_simulation.step();
+    fluid_simulation.step();
     draw(); 
   }
 
@@ -109,7 +109,7 @@ void init_shaders() {
   glm::vec3 highlightcolor(0.3f, 0.3f, 0.3f);
 
   //Point Sprite shader
-  particle_shader.shader_program = LoadShader("../src/particle_positioning.vert", "../src/point_sprite_sphere.frag");
+  particle_shader.shader_program = LoadShader("../src/point_sprite_positioning.vert", "../src/point_sprite_sphere.frag");
 	particle_shader.view_location = glGetUniformLocation(particle_shader.shader_program, "modelview");
 	particle_shader.projection_location = glGetUniformLocation(particle_shader.shader_program, "projection");
 	particle_shader.screen_size_location = glGetUniformLocation(particle_shader.shader_program, "screenSize");
@@ -197,9 +197,9 @@ void init_buffers() {
 	glGenBuffers(1, &vertex_buffer.EBO);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer.VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(fluid_simulation.vertices), fluid_simulation.vertices, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fluid_simulation.num_vertices, fluid_simulation.vertices, GL_STREAM_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer.EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(fluid_simulation.indices), fluid_simulation.indices, GL_STREAM_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * fluid_simulation.num_points, fluid_simulation.indices, GL_STREAM_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); 
   
@@ -303,75 +303,13 @@ void init_background() {
 
 }
 
-void init_CL() {
-  std::vector< cl::Platform > platformList;
-  cl::Platform::get(&platformList);
-  fluid_simulation.err = platformList.size()!=0 ? CL_SUCCESS : -1;
-  fluid_simulation.checkErr("cl::Platform::get");
-  
-  std::cerr << "Platform number is: " << platformList.size() << std::endl;std::string platformVendor;
-  platformList[0].getInfo((cl_platform_info)CL_PLATFORM_VENDOR, &platformVendor);
-  std::cerr << "Platform is by: " << platformVendor << "\n";
-	
-	CGLContextObj     CGLGetCurrentContext(void);
-	CGLShareGroupObj  CGLGetShareGroup(CGLContextObj);
-	
-	CGLContextObj     kCGLContext     = CGLGetCurrentContext();
-	CGLShareGroupObj  kCGLShareGroup  = CGLGetShareGroup(kCGLContext);
-	
-	cl_context_properties properties[] =
-	{
-	  CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
-	  (cl_context_properties) kCGLShareGroup,
-	  0
-	};
-  
-  fluid_simulation.context = cl::Context(CL_DEVICE_TYPE_GPU, properties, NULL, NULL, &fluid_simulation.err);
-  fluid_simulation.checkErr( "Context::Context()");
-	
-  fluid_simulation.devices = fluid_simulation.context.getInfo<CL_CONTEXT_DEVICES>();
-  fluid_simulation.err = fluid_simulation.devices.size() > 0 ? CL_SUCCESS : -1;
-  fluid_simulation.checkErr("devices.size() > 0");
-
-  std::ifstream file("../src/simulation.cl");
-  fluid_simulation.err = file.is_open() ? CL_SUCCESS:-1;
-  fluid_simulation.checkErr("simulation.cl");
-
-  std::string prog(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
-  cl::Program::Sources source(1, std::make_pair(prog.c_str(), prog.length()+1));
-  fluid_simulation.program = cl::Program(fluid_simulation.context, source);
-  fluid_simulation.err = fluid_simulation.program.build(fluid_simulation.devices,"");
-  fluid_simulation.checkErr("Program::build()");
-
-  fluid_simulation.step_kernel = cl::Kernel(fluid_simulation.program, "timestep", &fluid_simulation.err);
-  fluid_simulation.checkErr("Kernel::Kernel()");
-  
-  fluid_simulation.update_kernel = cl::Kernel(fluid_simulation.program, "update", &fluid_simulation.err);
-  fluid_simulation.checkErr("Kernel::Kernel()");
-	
-  fluid_simulation.cl_positions = cl::BufferGL(fluid_simulation.context, CL_MEM_READ_WRITE, vertex_buffer.VBO, &fluid_simulation.err);
-	fluid_simulation.checkErr("cl::BufferGL cl_positions");
-
-	float* zeros = (float*) malloc(sizeof(float) * num_vertices);
-  fluid_simulation.cl_previous_positions = cl::Buffer(fluid_simulation.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * num_vertices, zeros, &fluid_simulation.err); 
-	fluid_simulation.checkErr("cl::Buffer cl_previous_positions");
-
-  fluid_simulation.cl_new_positions = cl::Buffer(fluid_simulation.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * num_vertices, zeros, &fluid_simulation.err); 
-	fluid_simulation.checkErr("cl::Buffer cl_new_positions");
-
-  fluid_simulation.cl_velocities = cl::Buffer(fluid_simulation.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * num_vertices, zeros, &fluid_simulation.err); 
-	fluid_simulation.checkErr("cl::Buffer cl_velocities");
-
-  fluid_simulation.cl_new_velocities = cl::Buffer(fluid_simulation.context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * num_vertices, zeros, &fluid_simulation.err); 
-	fluid_simulation.checkErr("cl::Buffer cl_new_velocities");
-}
-
 void init() {
+  fluid_simulation.init_params(8, 1.0f, 3.0f, -15.0f, -15.0f, -15.0f, 30, 16);
   fluid_simulation.init_test_particles();
   init_buffers();
   init_shaders();
   init_background();
-	init_CL();
+	fluid_simulation.init_CL(vertex_buffer.VBO);
 }
 
 void update_mouse_events() {
@@ -385,7 +323,7 @@ void update_mouse_events() {
 void draw() {
   glBindVertexArray(VAO);
   //Get Surface
-  //*/
+  /*/
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
 
@@ -408,7 +346,7 @@ void draw() {
   GLfloat depth0 = 0.0f;
   glClearBufferfv(GL_COLOR, 0, &depth0);
 
-  glDrawElements(GL_POINTS, num_per_side * num_per_side * num_per_side, GL_UNSIGNED_INT, (void *) 0);
+  glDrawElements(GL_POINTS, fluid_simulation.num_points, GL_UNSIGNED_INT, (void *) 0);
   
   //Clearing Parameters
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -418,7 +356,7 @@ void draw() {
   //End Surface 
 
   //Thickness
-  //*
+  /*
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE); 
   
@@ -434,7 +372,7 @@ void draw() {
   GLfloat thick1 = 1.0f;
   glClearBufferfv(GL_DEPTH, 0, &thick1);
 
-  glDrawElements(GL_POINTS, num_per_side * num_per_side * num_per_side, GL_UNSIGNED_INT, (void *) 0);
+  glDrawElements(GL_POINTS, fluid_simulation.num_points, GL_UNSIGNED_INT, (void *) 0);
   
   //Clearing Parameters 
   glDisable(GL_BLEND);
@@ -445,7 +383,7 @@ void draw() {
   //End Thickness
   
   //Curvature Smoothing
-  //*
+  /*
   glUseProgram(smoothing_shader.shader_program);
 
   glBindBuffer(GL_ARRAY_BUFFER, screen_quad_buffer.VBO);
@@ -472,7 +410,7 @@ void draw() {
   //*/
 
   //Render liquid quad
-  //*
+  /*
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUseProgram(liquid_shader.shader_program);
@@ -508,12 +446,11 @@ void draw() {
 	glUniformMatrix4fv(particle_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
 
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer.VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(fluid_simulation.vertices), fluid_simulation.vertices, GL_STREAM_DRAW);
 	glVertexAttribPointer(particle_shader.pos_location, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*) 0);	
 	glEnableVertexAttribArray(particle_shader.pos_location);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer.EBO);
 
-  glDrawArrays(GL_POINTS,0,num_per_side * num_per_side * num_per_side);
+  glDrawArrays(GL_POINTS,0,fluid_simulation.num_points);
   //*/
   glBindVertexArray(0);
   glfwSwapBuffers(window);

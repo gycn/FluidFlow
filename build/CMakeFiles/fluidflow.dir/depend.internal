@@ -118,6 +118,11 @@ CMakeFiles/fluidflow.dir/src/camera.cpp.o
  ../glm/vector_relational.hpp
  ../inc/camera.h
  /Users/garychen/Documents/CS184/FluidFlow/src/camera.cpp
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o
+ ../inc/fluid_simulation.h
+ ../inc/glad.h
+ ../inc/khrplatform.h
+ /Users/garychen/Documents/CS184/FluidFlow/src/fluid_simulation.cpp
 CMakeFiles/fluidflow.dir/src/lodepng.cpp.o
  ../inc/lodepng.h
  /Users/garychen/Documents/CS184/FluidFlow/src/lodepng.cpp
@@ -231,7 +236,6 @@ CMakeFiles/fluidflow.dir/src/main.cpp.o
  ../inc/GLShader.hpp
  ../inc/buffers.h
  ../inc/camera.h
- ../inc/cl.hpp
  ../inc/fluid_simulation.h
  ../inc/glad.h
  ../inc/khrplatform.h

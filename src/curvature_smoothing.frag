@@ -43,8 +43,8 @@ void main() {
 		float dzdxndyp = texture(particle_depths, coords - dx + dy).r;
 		float dzdxdy = (dzdxpdyp + dzdxndyn - dzdxpdyn - dzdxndyp) / 4.0f;
 
-    float Cx = 1.0f / screenSize.x / -projection[0][0];
-    float Cy = 1.0f / screenSize.y / -projection[1][1]; 
+    float Cx = 2.0f / screenSize.x / -projection[0][0];
+    float Cy = 2.0f / screenSize.y / -projection[1][1]; 
 		
 	  float dDdx = Cy * Cy * 2.0f * dzdx * dzdx2 + Cx * Cx * 2.0f * dzdy * dzdxdy 
       + Cx * Cx * Cy * Cy * 2.0f * depth * dzdx;

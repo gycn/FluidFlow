@@ -5,6 +5,7 @@
 // Parameters from the vertex shader
 in vec3 eyespacePos;
 in float eyespaceRadius;
+in float grid_assignment;
 
 // Uniforms
 uniform mat4 modelview;
@@ -36,6 +37,9 @@ void main() {
 
   // calculate lighting
   float diffuse = max(0.0f, dot(vec3(0, 0, 1.0f), normal));
+
+  //for testing neighbors
+  //vFragColor = vec4(1.0f, grid_assignment / 8000.0f, 0, 1.0f) * diffuse;
   vFragColor = vec4(1.0f, 0, 0, 1.0f) * diffuse;
 
 	// Calculate fragment position in eye space, project to find depth

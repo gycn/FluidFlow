@@ -105,9 +105,33 @@ CMakeFiles/fluidflow.dir/src/camera.cpp.o.provides: CMakeFiles/fluidflow.dir/src
 CMakeFiles/fluidflow.dir/src/camera.cpp.o.provides.build: CMakeFiles/fluidflow.dir/src/camera.cpp.o
 
 
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o: CMakeFiles/fluidflow.dir/flags.make
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o: ../src/fluid_simulation.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o -c /Users/garychen/Documents/CS184/FluidFlow/src/fluid_simulation.cpp
+
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/garychen/Documents/CS184/FluidFlow/src/fluid_simulation.cpp > CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.i
+
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/garychen/Documents/CS184/FluidFlow/src/fluid_simulation.cpp -o CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.s
+
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.requires:
+
+.PHONY : CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.requires
+
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.provides: CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.requires
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.provides.build
+.PHONY : CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.provides
+
+CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.provides.build: CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o
+
+
 CMakeFiles/fluidflow.dir/src/lodepng.cpp.o: CMakeFiles/fluidflow.dir/flags.make
 CMakeFiles/fluidflow.dir/src/lodepng.cpp.o: ../src/lodepng.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/fluidflow.dir/src/lodepng.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/fluidflow.dir/src/lodepng.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluidflow.dir/src/lodepng.cpp.o -c /Users/garychen/Documents/CS184/FluidFlow/src/lodepng.cpp
 
 CMakeFiles/fluidflow.dir/src/lodepng.cpp.i: cmake_force
@@ -131,7 +155,7 @@ CMakeFiles/fluidflow.dir/src/lodepng.cpp.o.provides.build: CMakeFiles/fluidflow.
 
 CMakeFiles/fluidflow.dir/src/main.cpp.o: CMakeFiles/fluidflow.dir/flags.make
 CMakeFiles/fluidflow.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/fluidflow.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/fluidflow.dir/src/main.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/fluidflow.dir/src/main.cpp.o -c /Users/garychen/Documents/CS184/FluidFlow/src/main.cpp
 
 CMakeFiles/fluidflow.dir/src/main.cpp.i: cmake_force
@@ -155,7 +179,7 @@ CMakeFiles/fluidflow.dir/src/main.cpp.o.provides.build: CMakeFiles/fluidflow.dir
 
 CMakeFiles/fluidflow.dir/src/glad.c.o: CMakeFiles/fluidflow.dir/flags.make
 CMakeFiles/fluidflow.dir/src/glad.c.o: ../src/glad.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/fluidflow.dir/src/glad.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/fluidflow.dir/src/glad.c.o"
 	/Library/Developer/CommandLineTools/usr/bin/cc  $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/fluidflow.dir/src/glad.c.o   -c /Users/garychen/Documents/CS184/FluidFlow/src/glad.c
 
 CMakeFiles/fluidflow.dir/src/glad.c.i: cmake_force
@@ -181,6 +205,7 @@ CMakeFiles/fluidflow.dir/src/glad.c.o.provides.build: CMakeFiles/fluidflow.dir/s
 fluidflow_OBJECTS = \
 "CMakeFiles/fluidflow.dir/src/GLShader.cpp.o" \
 "CMakeFiles/fluidflow.dir/src/camera.cpp.o" \
+"CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o" \
 "CMakeFiles/fluidflow.dir/src/lodepng.cpp.o" \
 "CMakeFiles/fluidflow.dir/src/main.cpp.o" \
 "CMakeFiles/fluidflow.dir/src/glad.c.o"
@@ -190,13 +215,14 @@ fluidflow_EXTERNAL_OBJECTS =
 
 fluidflow: CMakeFiles/fluidflow.dir/src/GLShader.cpp.o
 fluidflow: CMakeFiles/fluidflow.dir/src/camera.cpp.o
+fluidflow: CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o
 fluidflow: CMakeFiles/fluidflow.dir/src/lodepng.cpp.o
 fluidflow: CMakeFiles/fluidflow.dir/src/main.cpp.o
 fluidflow: CMakeFiles/fluidflow.dir/src/glad.c.o
 fluidflow: CMakeFiles/fluidflow.dir/build.make
 fluidflow: glfw/src/libglfw3.a
 fluidflow: CMakeFiles/fluidflow.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable fluidflow"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable fluidflow"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/fluidflow.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -206,6 +232,7 @@ CMakeFiles/fluidflow.dir/build: fluidflow
 
 CMakeFiles/fluidflow.dir/requires: CMakeFiles/fluidflow.dir/src/GLShader.cpp.o.requires
 CMakeFiles/fluidflow.dir/requires: CMakeFiles/fluidflow.dir/src/camera.cpp.o.requires
+CMakeFiles/fluidflow.dir/requires: CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o.requires
 CMakeFiles/fluidflow.dir/requires: CMakeFiles/fluidflow.dir/src/lodepng.cpp.o.requires
 CMakeFiles/fluidflow.dir/requires: CMakeFiles/fluidflow.dir/src/main.cpp.o.requires
 CMakeFiles/fluidflow.dir/requires: CMakeFiles/fluidflow.dir/src/glad.c.o.requires

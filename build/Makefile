@@ -247,6 +247,33 @@ src/camera.cpp.s:
 	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/camera.cpp.s
 .PHONY : src/camera.cpp.s
 
+src/fluid_simulation.o: src/fluid_simulation.cpp.o
+
+.PHONY : src/fluid_simulation.o
+
+# target to build an object file
+src/fluid_simulation.cpp.o:
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.o
+.PHONY : src/fluid_simulation.cpp.o
+
+src/fluid_simulation.i: src/fluid_simulation.cpp.i
+
+.PHONY : src/fluid_simulation.i
+
+# target to preprocess a source file
+src/fluid_simulation.cpp.i:
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.i
+.PHONY : src/fluid_simulation.cpp.i
+
+src/fluid_simulation.s: src/fluid_simulation.cpp.s
+
+.PHONY : src/fluid_simulation.s
+
+# target to generate assembly for a file
+src/fluid_simulation.cpp.s:
+	$(MAKE) -f CMakeFiles/fluidflow.dir/build.make CMakeFiles/fluidflow.dir/src/fluid_simulation.cpp.s
+.PHONY : src/fluid_simulation.cpp.s
+
 src/glad.o: src/glad.c.o
 
 .PHONY : src/glad.o
@@ -349,6 +376,9 @@ help:
 	@echo "... src/camera.o"
 	@echo "... src/camera.i"
 	@echo "... src/camera.s"
+	@echo "... src/fluid_simulation.o"
+	@echo "... src/fluid_simulation.i"
+	@echo "... src/fluid_simulation.s"
 	@echo "... src/glad.o"
 	@echo "... src/glad.i"
 	@echo "... src/glad.s"

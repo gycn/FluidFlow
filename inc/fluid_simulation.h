@@ -7,14 +7,10 @@
 #include <iostream>
 #include <string>
 #include <iterator>
-#include <cl.hpp>
+#include <OpenCL/cl.hpp>
 
-#define num_per_side 20
-#define num_points (num_per_side * num_per_side * num_per_side)
-#define num_vertices  (num_points * 4)
-#define spacing 1.0f
-
-struct FluidSimulation {
+class FluidSimulation {
+  public:
   void checkErr(const char * name) {
     if (err != CL_SUCCESS) {
       std::cerr << "ERROR: " << name  << " (" << err << ")" << std::endl;
@@ -40,7 +36,7 @@ struct FluidSimulation {
 	            ind++;
               vertices[ind] = 1.0f;
               ind++;
-	            //printf("%f, %f, %f\n", fluid_simulation.vertices[ind - 3], fluid_simulation.vertices[ind - 2], fluid_simulation.vertices[ind - 1]);
+	            printf("%f, %f, %f\n", vertices[ind - 4], vertices[ind - 3], vertices[ind - 2]);
 	          }   
 	      }   
 	  }   
@@ -50,82 +46,126 @@ struct FluidSimulation {
 	 }
 	
 	}
-  
-  void step() {
-    //Apply gravity & update based on current velocity
-    cl::CommandQueue queue(context, devices[0], 
-        0, &err);
-    checkErr("CommandQueue::CommandQueue()");
-  
-    err = step_kernel.setArg(0, cl_positions);
-    checkErr("Kernel::setArg()");
-    err = step_kernel.setArg(1, cl_new_positions);
-    checkErr("Kernel::setArg()");
-    err = step_kernel.setArg(2, cl_velocities);
-    checkErr("Kernel::setArg()");
-    err = step_kernel.setArg(3, cl_new_velocities);
-    checkErr("Kernel::setArg()");
-    err = step_kernel.setArg(4, num_points);
-    checkErr("Kernel::setArg()");
-  
-    cl::Event event;
-    err = queue.enqueueNDRangeKernel(step_kernel, 
-        cl::NullRange, cl::NDRange(num_points), cl::NDRange(1, 1),
-        NULL, &event);
-    checkErr("ComamndQueue::enqueueNDRangeKernel()");  
-    event.wait();
-    
-    //Update previous particle values to new values
-    err = update_kernel.setArg(0, cl_positions);
-    checkErr("Kernel::setArg()");
-    err = update_kernel.setArg(1, cl_new_positions);
-    checkErr("Kernel::setArg()");
-    err = update_kernel.setArg(2, cl_velocities);
-    checkErr("Kernel::setArg()");
-    err = update_kernel.setArg(3, cl_new_velocities);
-    checkErr("Kernel::setArg()");
-    err = update_kernel.setArg(4, num_points);
-    checkErr("Kernel::setArg()");
-  
-    err = queue.enqueueNDRangeKernel(update_kernel, 
-        cl::NullRange, cl::NDRange(num_points), cl::NDRange(1, 1),
-        NULL, &event);
-    checkErr("ComamndQueue::enqueueNDRangeKernel()");  
-    event.wait();
-  }
 
+  void step();
+  void sort();
+  void init_CL(GLuint vertex_VBO);
 
+  //Particle parameters
+  int num_per_side;
+  int num_points;
+  int num_vertices;
+  float spacing;
+  float radius;
 
+  float mass;
+  float h = 4.0f;
+  float density = 1.0f;
+
+  //Neighbor grid parameters
+  int num_grids_per_side;
+  float x_start, y_start, z_start;
+  int cells_per_side;
+  int num_per_cell;
+  float grid_width;
+  int num_grids;
+
+  //CL stuff
 	cl_int err;
 	cl::Context context;
-	
-	GLfloat vertices[num_vertices];
-  GLuint indices[num_points];	
+  cl::CommandQueue queue;
+  cl::Event event;
+  
+  
+  //GL Buffers for particle positions
+	GLfloat * vertices;
+  GLuint * indices;	
 
 	//CL Buffers for particle data  
-  cl::Buffer cl_previous_positions;
   cl::BufferGL cl_positions;
-  cl::Buffer cl_new_positions;
+  cl::Buffer cl_new_positions[2];
 
   cl::Buffer cl_velocities;
   cl::Buffer cl_new_velocities;
-  
-  //CL Buffers for neighbors
-  cl::Buffer cl_hash_values;
+
+  cl::Buffer cl_lambdas;
+
   cl::Buffer cl_grid_starts;
-  cl::Buffer cl_sorted_particles;
- 
+
   //CL objects
   std::vector<cl::Device> devices;
   cl::Program program;
+  cl::Program sort_program;
 
   //CL kernels
   cl::Kernel step_kernel;
+  cl::Kernel density_lambda_kernel;
+  cl::Kernel lambda_pos_kernel;
   cl::Kernel update_kernel;
+  cl::Kernel collision_kernel;
+  cl::Kernel hash_kernel;
+  cl::Kernel grid_kernel;
 
-  //Radix sort
-  int num_zeros;
-  int num_ones;
+  //Sorting
+  cl::Kernel hist_kernel;
+  cl::Kernel scan_kernel;
+  cl::Kernel sum_kernel;
+  cl::Kernel offset_kernel;
+  cl::Kernel reorder_kernel;
+
+  cl::Buffer cl_hist;
+  cl::Buffer cl_sums;
+  cl::Buffer cl_offsets;
+  cl::Buffer cl_offset_sums;
+
+  cl::Buffer cl_hashes[2];
+  cl::Buffer cl_indices[2];
+
+  cl::LocalSpaceArg local_hist;
+  cl::LocalSpaceArg local_scan_sums;
+  cl::LocalSpaceArg local_reorder_sums;
+
+  int num_blocks;
+  int threads_per_block = 2;
+  int num_per_thread = 2;
+  int total_threads;
+  int splits = 8;
+
+  int radix_size = 4;
+  int sort_passes = 16;
+  int radix_bits = 2;
+  cl_uint radix_mask = 0b11;
+
+  cl_int * negative_ones;
+
+  void init_params(int nps, float s, float gw, 
+                   float xstrt, float ystrt, float zstrt,
+                   int gps, int npc) {
+    num_per_side = nps;
+    spacing = s;
+    radius = s/2.0f;
+    mass = density * 4.0f * radius * radius * radius * 3.141592 / 3.0f;
+    num_points = num_per_side * num_per_side * num_per_side;
+    num_vertices = 4 * num_points;
+
+    printf("%f\n", mass);
+
+    x_start = xstrt;
+    y_start = ystrt;
+    z_start = zstrt;
+    
+    cells_per_side = gps;
+    num_per_cell = npc;
+  
+    grid_width = gw;
+    vertices = (GLfloat*) malloc(num_vertices * sizeof(GLfloat));
+    indices = (GLuint*) malloc(num_points * sizeof(GLuint));
+    num_grids = cells_per_side * cells_per_side * cells_per_side;
+    
+    num_blocks = num_points / num_per_thread / threads_per_block;
+    total_threads = num_blocks * threads_per_block;
+  }
+
 };
 
 

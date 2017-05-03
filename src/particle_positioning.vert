@@ -8,7 +8,7 @@ uniform mat4 modelview;
 uniform mat4 projection;
 uniform vec2 screenSize;
 
-float radius = 0.6f;
+float radius = 0.5f;
 
 void main() {
   vec4 test_point = vec4(pos.xyz, 1.0f) + vec4(0, radius, 0, 0);

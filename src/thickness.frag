@@ -19,8 +19,11 @@ void main() {
   if(dist > 1.0f) {
     discard;
   }
-	
-	particle_width = 1.0f - 0.3f * length(normal);
+
+  float len = sqrt(dist);
+	float theta = acos(len);
+
+	particle_width = tan(theta) * len;
 
 	// Calculate fragment position in eye space, project to find depth
 	vec4 fragPos = vec4(eyespacePos + normal * eyespaceRadius / screenSize.y, 1.0);

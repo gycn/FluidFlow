@@ -65,13 +65,10 @@ void FluidSimulation::step() {
       NULL, &event);
   checkErr("ComamndQueue::enqueueNDRangeKernel()");  
   event.wait();
-  //cl_uint start_read[num_grids];
-  //queue.enqueueReadBuffer(cl_grid_starts, true, 0, sizeof(cl_uint) * num_grids, start_read);
-  //for (int i = 0; i < num_grids; i++) printf("%d ", start_read[i]);
-  //printf("\n");
 
   int ind = 0;
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 5; i++) {
+    //*
     //Calculate lambdas
     err = density_lambda_kernel.setArg(0, cl_new_positions[ind]); 
     checkErr("Kernel::setArg()");
@@ -95,14 +92,22 @@ void FluidSimulation::step() {
     checkErr("Kernel::setArg()");
     err = density_lambda_kernel.setArg(10, cl_lambdas);
     checkErr("kernel::setArg()");
+    err = density_lambda_kernel.setArg(11, grid_width);
+    checkErr("kernel::setArg()");
+    err = density_lambda_kernel.setArg(12, x_start);
+    checkErr("kernel::setArg()");
+    err = density_lambda_kernel.setArg(13, y_start);
+    checkErr("kernel::setArg()");
+    err = density_lambda_kernel.setArg(14, z_start);
+    checkErr("kernel::setArg()");
 
     err = queue.enqueueNDRangeKernel(density_lambda_kernel, 
         cl::NullRange, cl::NDRange(num_points), cl::NDRange(1, 1),
         NULL, &event);
     checkErr("ComamndQueue::enqueueNDRangeKernel()");  
     event.wait();
-
-  //* 
+    //*/
+    //* 
     //Set new positions
     err = lambda_pos_kernel.setArg(0, cl_new_positions[ind]); 
     checkErr("Kernel::setArg()");
@@ -124,6 +129,16 @@ void FluidSimulation::step() {
     checkErr("Kernel::setArg()");
     err = lambda_pos_kernel.setArg(9, cl_new_positions[1 - ind]);
     checkErr("kernel::setArg()");
+    err = lambda_pos_kernel.setArg(10, grid_width);
+    checkErr("kernel::setArg()");
+    err = lambda_pos_kernel.setArg(11, x_start);
+    checkErr("kernel::setArg()");
+    err = lambda_pos_kernel.setArg(12, y_start);
+    checkErr("kernel::setArg()");
+    err = lambda_pos_kernel.setArg(13, z_start);
+    checkErr("kernel::setArg()");
+    err = lambda_pos_kernel.setArg(14, density);
+    checkErr("kernel::SetArg()");
 
     err = queue.enqueueNDRangeKernel(lambda_pos_kernel, 
         cl::NullRange, cl::NDRange(num_points), cl::NDRange(1, 1),
@@ -131,7 +146,8 @@ void FluidSimulation::step() {
     checkErr("ComamndQueue::enqueueNDRangeKernel()");  
     event.wait();
     ind = 1 - ind;
-  /*
+  //*/
+  //*
     //adjust for collisions
     err = collision_kernel.setArg(0, cl_new_positions[ind]); 
     checkErr("Kernel::setArg()");
@@ -152,6 +168,14 @@ void FluidSimulation::step() {
     err = collision_kernel.setArg(8, spacing);
     checkErr("Kernel::setArg()");
     err = collision_kernel.setArg(9, cl_new_positions[1 - ind]);
+    checkErr("kernel::setArg()");
+    err = collision_kernel.setArg(10, grid_width);
+    checkErr("kernel::setArg()");
+    err = collision_kernel.setArg(11, x_start);
+    checkErr("kernel::setArg()");
+    err = collision_kernel.setArg(12, y_start);
+    checkErr("kernel::setArg()");
+    err = collision_kernel.setArg(13, z_start);
     checkErr("kernel::setArg()");
 
     err = queue.enqueueNDRangeKernel(collision_kernel, 
@@ -179,6 +203,39 @@ void FluidSimulation::step() {
       NULL, &event);
   checkErr("ComamndQueue::enqueueNDRangeKernel()");  
   event.wait();
+
+  /*err = velocity_kernel.setArg(0, cl_new_velocities); 
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(1, cl_new_positions[ind]); 
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(2, cl_grid_starts);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(3, cl_indices[0]);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(4, cl_hashes[0]);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(5, num_points);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(6, cells_per_side);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(7, num_grids);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(8, grid_width);
+  checkErr("Kernel::setArg()");
+  err = velocity_kernel.setArg(9, x_start);
+  checkErr("kernel::setArg()");
+  err = velocity_kernel.setArg(10, y_start);
+  checkErr("kernel::setArg()");
+  err = velocity_kernel.setArg(11, z_start);
+  checkErr("kernel::setArg()");
+  err = velocity_kernel.setArg(12, h);
+  checkErr("Kernel::setArg()");
+
+  err = queue.enqueueNDRangeKernel(velocity_kernel, 
+      cl::NullRange, cl::NDRange(num_points), cl::NDRange(1, 1),
+      NULL, &event);
+  checkErr("ComamndQueue::enqueueNDRangeKernel()");  
+  event.wait();*/
 }
 
 
@@ -257,6 +314,9 @@ void FluidSimulation::init_CL(GLuint vertex_VBO) {
   grid_kernel = cl::Kernel(program, "find_grid_starts", &err);
   checkErr("Kernel::Kernel() grid_kernel");
 
+  velocity_kernel = cl::Kernel(program, "update_velocities", &err);
+  checkErr("Kernel::Kernel() velocity_kernel");
+
   //Radix sort kernels
   hist_kernel = cl::Kernel(sort_program, "histogram", &err);
   checkErr("Kernel::Kernel() hist_kernel");
@@ -321,7 +381,7 @@ void FluidSimulation::init_CL(GLuint vertex_VBO) {
 
   cl_offset_sums =  cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_uint) * splits, NULL, &err);
 
-  cl_uint * inds = (cl_uint *) malloc(sizeof(cl_uint) * num_points);
+  inds = (cl_uint *) malloc(sizeof(cl_uint) * num_points);
   for (cl_uint i = 0; i < num_points; i++) {
     inds[i] = i;
   }
@@ -337,7 +397,6 @@ void FluidSimulation::init_CL(GLuint vertex_VBO) {
   local_hist = cl::Local(sizeof(cl_uint) * threads_per_block * radix_size);
   local_reorder_sums = cl::Local(sizeof(cl_uint) * threads_per_block * radix_size);
 
-  free(inds);
 
   negative_ones = (cl_int *) malloc(sizeof(cl_int) * num_grids);
   for (int i = 0; i < num_grids; i++) negative_ones[i] = -1;
@@ -347,6 +406,8 @@ void FluidSimulation::sort() {
   cl_uint mask = radix_mask;
   int ind = 0;
   cl_uint shift = 0;
+  queue.enqueueWriteBuffer(cl_indices[0], true, 0, sizeof(cl_int) * num_points, inds);
+
   for(int i = 0; i < sort_passes; i++) {
     err = hist_kernel.setArg(0, cl_hashes[ind]);   
     checkErr("Kernel::setArg()");
@@ -503,7 +564,7 @@ void FluidSimulation::sort() {
     event.wait();
 
     //cl_uint sums_read[num_points];
-    //queue.enqueueReadBuffer(cl_hashes[ind], true, 0, num_points * sizeof(cl_uint), sums_read);
+    //queue.enqueueReadBuffer(cl_indices[ind], true, 0, num_points * sizeof(cl_uint), sums_read);
     //for (int i = 0; i < num_points; i++) {
     //  printf("%d ", sums_read[i]);
     //  if ((i + 1) % total_threads == 0) {

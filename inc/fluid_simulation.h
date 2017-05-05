@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <iterator>
+#include <cmath>
 #include <OpenCL/cl.hpp>
 
 class FluidSimulation {
@@ -20,17 +21,41 @@ class FluidSimulation {
 
 	// Particle Initialization
 	void init_test_particles() {
+    vertices = (GLfloat*) malloc((num_vertices + 256) * sizeof(GLfloat));
+    indices = (GLuint*) malloc((num_points +  64)* sizeof(GLuint));
 	  float center = (float) (num_per_side - 1.0f) * spacing / 2.0f;
 	  int ind = 0;
-	  for(int x=0; x < num_per_side; x++)
+    float offset = 0.01;
+    float xoff = 0.01f;
+	  for(int y=0; y < num_per_side; y++)
 	  {
-	      for(int y=0; y < num_per_side; y++)
+	      for(int x=0; x < num_per_side; x++)
 	      {
 	          for(int z=0; z < num_per_side; z++)
 	          {   
-	            vertices[ind] = (float) x * spacing - center;
+	            vertices[ind] = (float) x * spacing - center + xoff;
 	            ind++;
 	            vertices[ind] = (float) y * spacing - center;
+	            ind++;
+	            vertices[ind] = (float) z * spacing - center + offset;
+	            ind++;
+              vertices[ind] = 1.0f;
+              ind++;
+	            printf("%f, %f, %f\n", vertices[ind - 4], vertices[ind - 3], vertices[ind - 2]);
+	          }   
+       }   
+	  }   
+    /*
+	  center = (float) (3.0f) * spacing / 2.0f;
+	  for(int x=0; x < 4; x++)
+	  {
+	      for(int y=0; y < 4; y++)
+	      {
+	          for(int z=0; z < 4; z++)
+	          {   
+	            vertices[ind] = (float) x * spacing - center;
+	            ind++;
+	            vertices[ind] = (float) y * spacing - center + 15.0f;
 	            ind++;
 	            vertices[ind] = (float) z * spacing - center;
 	            ind++;
@@ -40,8 +65,10 @@ class FluidSimulation {
 	          }   
 	      }   
 	  }   
-	 
-	 for (int i = 0; i < num_per_side * num_per_side * num_per_side; i++) {
+    num_points += 64;
+    num_vertices += 256;
+	 //*/
+	 for (int i = 0; i < num_per_side * num_per_side * num_per_side + 64; i++) {
 	   indices[i] = i;
 	 }
 	
@@ -52,22 +79,20 @@ class FluidSimulation {
   void init_CL(GLuint vertex_VBO);
 
   //Particle parameters
-  int num_per_side;
-  int num_points;
-  int num_vertices;
+  int num_per_side = 32;
+  int num_points = 32768;
+  int num_vertices = 131072;
   float spacing;
-  float radius;
+  float radius = 0.05f;
 
-  float mass;
-  float h = 4.0f;
-  float density = 1.0f;
+  float mass = 1.0f;
+  float h = 0.2f;
+  float density = 700.0f;
 
   //Neighbor grid parameters
-  int num_grids_per_side;
-  float x_start, y_start, z_start;
-  int cells_per_side;
-  int num_per_cell;
-  float grid_width;
+  float x_start = -3.0f, y_start = -3.0f, z_start = -3.0f;
+  int cells_per_side = 30;
+  float grid_width = 0.20f;
   int num_grids;
 
   //CL stuff
@@ -105,6 +130,7 @@ class FluidSimulation {
   cl::Kernel collision_kernel;
   cl::Kernel hash_kernel;
   cl::Kernel grid_kernel;
+  cl::Kernel velocity_kernel;
 
   //Sorting
   cl::Kernel hist_kernel;
@@ -126,10 +152,10 @@ class FluidSimulation {
   cl::LocalSpaceArg local_reorder_sums;
 
   int num_blocks;
-  int threads_per_block = 2;
-  int num_per_thread = 2;
+  int threads_per_block = 256;
+  int num_per_thread = 4;
   int total_threads;
-  int splits = 8;
+  int splits = 128;
 
   int radix_size = 4;
   int sort_passes = 16;
@@ -137,29 +163,15 @@ class FluidSimulation {
   cl_uint radix_mask = 0b11;
 
   cl_int * negative_ones;
+  cl_uint * inds;
 
   void init_params(int nps, float s, float gw, 
                    float xstrt, float ystrt, float zstrt,
                    int gps, int npc) {
-    num_per_side = nps;
-    spacing = s;
-    radius = s/2.0f;
-    mass = density * 4.0f * radius * radius * radius * 3.141592 / 3.0f;
-    num_points = num_per_side * num_per_side * num_per_side;
-    num_vertices = 4 * num_points;
+    spacing = radius * 2.0f;
 
     printf("%f\n", mass);
-
-    x_start = xstrt;
-    y_start = ystrt;
-    z_start = zstrt;
     
-    cells_per_side = gps;
-    num_per_cell = npc;
-  
-    grid_width = gw;
-    vertices = (GLfloat*) malloc(num_vertices * sizeof(GLfloat));
-    indices = (GLuint*) malloc(num_points * sizeof(GLuint));
     num_grids = cells_per_side * cells_per_side * cells_per_side;
     
     num_blocks = num_points / num_per_thread / threads_per_block;

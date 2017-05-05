@@ -9,6 +9,7 @@ struct ParticleShader {
   GLint projection_location;
   GLint screen_size_location;
   GLint pos_location;
+  GLint radius_location;
 };
 
 struct DepthShader {
@@ -17,7 +18,18 @@ struct DepthShader {
   GLint projection_location;
   GLint screen_size_location;
   GLint pos_location;
+  GLint radius_location;
 };
+
+struct DepthDemoShader {
+  GLuint shader_program;
+  GLint view_location;
+  GLint projection_location;
+  GLint screen_size_location;
+  GLint pos_location;
+  GLint radius_location;
+};
+
 
 struct SmoothingShader {
   GLuint shader_program;
@@ -33,6 +45,7 @@ struct ThicknessShader {
   GLint projection_location;
   GLint screen_size_location;
   GLint pos_location;
+  GLint radius_location;
 };
 
 struct LiquidShader {
@@ -49,7 +62,9 @@ struct LiquidShader {
 };
 ParticleShader particle_shader;
 DepthShader depth_shader;
+DepthDemoShader depth_demo_shader;
 SmoothingShader smoothing_shader;
 ThicknessShader thickness_shader;
+ThicknessShader thickness_demo_shader;
 LiquidShader liquid_shader;
 #endif

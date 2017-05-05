@@ -13,6 +13,8 @@ set(CMAKE_C_COMPILER_ID "AppleClang")
 set(CMAKE_C_TARGET_INCLUDE_PATH
   "../inc"
   "../glm"
+  "/usr/local/include/opencv"
+  "/usr/local/include"
   "../glfw/include"
   "/System/Library/Frameworks/OpenCL.framework"
   )
@@ -29,6 +31,8 @@ set(CMAKE_CXX_COMPILER_ID "AppleClang")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../inc"
   "../glm"
+  "/usr/local/include/opencv"
+  "/usr/local/include"
   "../glfw/include"
   "/System/Library/Frameworks/OpenCL.framework"
   )

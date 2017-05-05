@@ -221,6 +221,25 @@ fluidflow: CMakeFiles/fluidflow.dir/src/main.cpp.o
 fluidflow: CMakeFiles/fluidflow.dir/src/glad.c.o
 fluidflow: CMakeFiles/fluidflow.dir/build.make
 fluidflow: glfw/src/libglfw3.a
+fluidflow: /usr/local/lib/libopencv_videostab.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_ts.a
+fluidflow: /usr/local/lib/libopencv_superres.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_stitching.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_contrib.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_nonfree.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_ocl.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_gpu.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_photo.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_objdetect.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_legacy.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_video.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_ml.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_calib3d.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_features2d.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_highgui.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_imgproc.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_flann.2.4.13.dylib
+fluidflow: /usr/local/lib/libopencv_core.2.4.13.dylib
 fluidflow: CMakeFiles/fluidflow.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/garychen/Documents/CS184/FluidFlow/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable fluidflow"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/fluidflow.dir/link.txt --verbose=$(VERBOSE)

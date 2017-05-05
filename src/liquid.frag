@@ -49,13 +49,13 @@ vec3 normal(vec2 pos) {
 
 	// Derivatives of z
 	// For shading, one-sided only-the-one-that-works version
-	float zdxp = texture(surface, pos + dx).r;
-	float zdxn = texture(surface, pos - dx).r;
-	float zdx = (zdxp == 0.0f) ? (zdxn == 0.0f ? 0.0f : (zc - zdxn)) : (zdxp - zc);
+	float zdxp = texture(surface, pos + dx).r - zc;
+	float zdxn = zc - texture(surface, pos - dx).r;
+  float zdx = (abs(zdxp) < abs(zdxn)) ? zdxp : zdxn; 
 
-	float zdyp = texture(surface, pos + dy).r;
-	float zdyn = texture(surface, pos - dy).r;
-	float zdy = (zdyp == 0.0f) ? (zdyn == 0.0f ? 0.0f : (zc - zdyn)) : (zdyp - zc);
+	float zdyp = texture(surface, pos + dy).r - zc;
+	float zdyn = zc - texture(surface, pos - dy).r;
+  float zdy = (abs(zdyp) < abs(zdyn)) ? zdyp : zdyn; 
 
 	// Projection inversion
 	float cx = 2.0f / (screenSize.x * -projection[0][0]);
@@ -97,10 +97,14 @@ void main() {
   
   float normalhangle = dot(h, worldnormal);
 
-  float thickness = texture(thickness, coords).r / 8.0f;
+  float thickness = max(texture(thickness, coords).r * 0.5f, 1.0f);
   
-  vec3 colorxyz =a(fluid_color, texture(background, vec2(1.0f) - coords).xyz, thickness) * (1.0f - fresnel(normalcameraangle, 1.0f, 1.5f)) + highlight_color * pow(normalhangle, 1.5f); 
+  normalcameraangle = max(smoothstep(0.95, 1.0, abs(normalcameraangle)), 0.05) * 1.5f + 0.2f;
+  
+  float offset = 1.0f - fresnel(normalcameraangle, 1.0f, 1.5f); 
+  vec3 colorxyz =a(fluid_color, texture(background, vec2(1.0f) - coords).xyz, thickness) * offset + highlight_color * pow(normalhangle, 2.0f) + vec3(0.1f); 
   if (depth == 0) colorxyz = texture(background, vec2(1.0f) - coords).xyz;
+ 
   color = vec4(colorxyz, 1.0f);
 }
 

@@ -7,11 +7,11 @@ C_FLAGS =
 
 C_DEFINES = 
 
-C_INCLUDES = -I/Users/garychen/Documents/CS184/FluidFlow/inc -I/Users/garychen/Documents/CS184/FluidFlow/glm -I/Users/garychen/Documents/CS184/FluidFlow/glfw/include 
+C_INCLUDES = -I/Users/garychen/Documents/CS184/FluidFlow/inc -I/Users/garychen/Documents/CS184/FluidFlow/glm -I/usr/local/include/opencv -I/usr/local/include -I/Users/garychen/Documents/CS184/FluidFlow/glfw/include 
 
 CXX_FLAGS =  
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/garychen/Documents/CS184/FluidFlow/inc -I/Users/garychen/Documents/CS184/FluidFlow/glm -I/Users/garychen/Documents/CS184/FluidFlow/glfw/include 
+CXX_INCLUDES = -I/Users/garychen/Documents/CS184/FluidFlow/inc -I/Users/garychen/Documents/CS184/FluidFlow/glm -I/usr/local/include/opencv -I/usr/local/include -I/Users/garychen/Documents/CS184/FluidFlow/glfw/include 
 

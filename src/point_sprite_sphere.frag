@@ -38,8 +38,10 @@ void main() {
   // calculate lighting
   float diffuse = max(0.0f, dot(vec3(0, 0, 1.0f), normal));
 
+  int grid = int(grid_assignment);
+
   //for testing neighbors
-  //vFragColor = vec4(1.0f, grid_assignment / 8000.0f, 0, 1.0f) * diffuse;
+  //vFragColor = vec4(grid / 27000.0f, (grid % 900) / 900.0f, (grid % 30) / 30.0f, 1.0f) * diffuse;
   vFragColor = vec4(1.0f, 0, 0, 1.0f) * diffuse;
 
 	// Calculate fragment position in eye space, project to find depth

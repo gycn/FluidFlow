@@ -15,6 +15,8 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
+#include <opencv2/opencv.hpp>
+
 #include "lodepng.h"
 
 #include "buffers.h"
@@ -38,7 +40,7 @@ GLuint background;
 FluidSimulation fluid_simulation;
 
 GLFWwindow* window;
-Camera camera(glm::vec3(0.0f,0.0f, 40.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0), WIDTH, HEIGHT);
+Camera camera(glm::vec3(6.0f,5.0f, 10.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0), WIDTH, HEIGHT);
 GLuint VAO;
 
 void init();
@@ -49,6 +51,12 @@ void update_mouse_events();
 //Callback declarations
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_callback(GLFWwindow* window, int button, int action, int mods);
+
+bool fin = false;
+bool thickness = false;
+bool point_sprite = true;
+bool depth = false;
+bool smoothed = false;
 
 int main()
 {
@@ -85,6 +93,9 @@ int main()
 
   glClearDepth(1.0f);
   glEnable( GL_PROGRAM_POINT_SIZE );
+  
+  cv::VideoWriter outputVideo;
+  outputVideo.open( "video.avi", -1, 20.0f, cv::Size( WIDTH * 2, HEIGHT * 2 ), true);
 
   while (!glfwWindowShouldClose(window))
   {
@@ -92,7 +103,19 @@ int main()
     update_mouse_events();
     fluid_simulation.step();
     draw(); 
+		
+		cv::Mat pixels( HEIGHT * 2, WIDTH * 2, CV_8UC3 );
+		glReadPixels(0, 0, WIDTH * 2, HEIGHT * 2, GL_RGB, GL_UNSIGNED_BYTE, pixels.data );
+		cv::Mat cv_pixels( HEIGHT * 2, WIDTH * 2, CV_8UC3 );
+		for( int y=0; y<HEIGHT * 2; y++ ) for( int x=0; x<WIDTH * 2; x++ ) 
+		{
+		    cv_pixels.at<cv::Vec3b>(y,x)[2] = pixels.at<cv::Vec3b>(HEIGHT * 2-y-1,x)[0];
+		    cv_pixels.at<cv::Vec3b>(y,x)[1] = pixels.at<cv::Vec3b>(HEIGHT * 2-y-1,x)[1];
+		    cv_pixels.at<cv::Vec3b>(y,x)[0] = pixels.at<cv::Vec3b>(HEIGHT * 2-y-1,x)[2];
+		}
+		outputVideo.write(cv_pixels);
   }
+	outputVideo.release();
 
   // Terminate GLFW, clearing any resources allocated by GLFW.
   glfwTerminate();
@@ -104,8 +127,8 @@ void init_shaders() {
   screensize.x = depth_buffer.width;
   screensize.y = depth_buffer.height;
 
-  glm::vec3 lightdir(0.0f, 0.0f, 1.0f);
-  glm::vec3 fluidcolor(0.01f, 0.1f, 0.4f);
+  glm::vec3 lightdir(0.0f, -1.0f, -0.5f);
+  glm::vec3 fluidcolor(.275f, 0.65f, 0.85f);
   glm::vec3 highlightcolor(0.3f, 0.3f, 0.3f);
 
   //Point Sprite shader
@@ -113,6 +136,7 @@ void init_shaders() {
 	particle_shader.view_location = glGetUniformLocation(particle_shader.shader_program, "modelview");
 	particle_shader.projection_location = glGetUniformLocation(particle_shader.shader_program, "projection");
 	particle_shader.screen_size_location = glGetUniformLocation(particle_shader.shader_program, "screenSize");
+  particle_shader.radius_location = glGetUniformLocation(particle_shader.shader_program, "radius");
   particle_shader.pos_location = glGetAttribLocation(particle_shader.shader_program, "pos");
 
 	glUseProgram(particle_shader.shader_program);
@@ -120,12 +144,14 @@ void init_shaders() {
   glUniformMatrix4fv(particle_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
 	glUniformMatrix4fv(particle_shader.projection_location, 1, GL_FALSE, glm::value_ptr(camera.prsp));
   glUniform2fv(particle_shader.screen_size_location, 1, glm::value_ptr(screensize));
+  glUniform1fv(particle_shader.radius_location, 1, &fluid_simulation.radius);
   
   //Depth Shader
   depth_shader.shader_program = LoadShader("../src/particle_positioning.vert", "../src/particle_depth.frag");
 	depth_shader.view_location = glGetUniformLocation(depth_shader.shader_program, "modelview");
 	depth_shader.projection_location = glGetUniformLocation(depth_shader.shader_program, "projection");
 	depth_shader.screen_size_location = glGetUniformLocation(depth_shader.shader_program, "screenSize");
+  depth_shader.radius_location = glGetUniformLocation(particle_shader.shader_program, "radius");
   depth_shader.pos_location = glGetAttribLocation(depth_shader.shader_program, "pos");
 
 	glUseProgram(depth_shader.shader_program);
@@ -133,8 +159,26 @@ void init_shaders() {
   glUniformMatrix4fv(depth_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
 	glUniformMatrix4fv(depth_shader.projection_location, 1, GL_FALSE, glm::value_ptr(camera.prsp));
   glUniform2fv(depth_shader.screen_size_location, 1, glm::value_ptr(screensize));
+  glUniform1fv(depth_shader.radius_location, 1, &fluid_simulation.radius);
 
   glBindFragDataLocation(depth_shader.shader_program, 0, "particleDepth");
+
+  //Depth Shader
+  depth_demo_shader.shader_program = LoadShader("../src/particle_positioning.vert", "../src/particle_depth_demo.frag");
+	depth_demo_shader.view_location = glGetUniformLocation(depth_demo_shader.shader_program, "modelview");
+	depth_demo_shader.projection_location = glGetUniformLocation(depth_demo_shader.shader_program, "projection");
+	depth_demo_shader.screen_size_location = glGetUniformLocation(depth_demo_shader.shader_program, "screenSize");
+  depth_demo_shader.radius_location = glGetUniformLocation(particle_shader.shader_program, "radius");
+  depth_demo_shader.pos_location = glGetAttribLocation(depth_demo_shader.shader_program, "pos");
+
+	glUseProgram(depth_demo_shader.shader_program);
+
+  glUniformMatrix4fv(depth_demo_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+	glUniformMatrix4fv(depth_demo_shader.projection_location, 1, GL_FALSE, glm::value_ptr(camera.prsp));
+  glUniform2fv(depth_demo_shader.screen_size_location, 1, glm::value_ptr(screensize));
+  glUniform1fv(depth_demo_shader.radius_location, 1, &fluid_simulation.radius);
+
+  glBindFragDataLocation(depth_demo_shader.shader_program, 0, "particleDepth");
 
   //Smoothing Shader
   smoothing_shader.shader_program = LoadShader("../src/quad.vert", "../src/curvature_smoothing.frag");
@@ -155,14 +199,32 @@ void init_shaders() {
 	thickness_shader.view_location = glGetUniformLocation(thickness_shader.shader_program, "modelview");
 	thickness_shader.projection_location = glGetUniformLocation(thickness_shader.shader_program, "projection");
 	thickness_shader.screen_size_location = glGetUniformLocation(thickness_shader.shader_program, "screenSize");
+  thickness_shader.radius_location = glGetUniformLocation(particle_shader.shader_program, "radius");
   thickness_shader.pos_location = glGetAttribLocation(thickness_shader.shader_program, "pos");
 
 	glUseProgram(thickness_shader.shader_program);
 
 	glUniformMatrix4fv(thickness_shader.projection_location, 1, GL_FALSE, glm::value_ptr(camera.prsp));
   glUniform2fv(thickness_shader.screen_size_location, 1, glm::value_ptr(screensize));
+  glUniform1fv(thickness_shader.radius_location, 1, &fluid_simulation.radius);
 
   glBindFragDataLocation(thickness_shader.shader_program, 0, "particle_width");
+
+  //Thickness DEMO Shader
+  thickness_demo_shader.shader_program = LoadShader("../src/particle_positioning.vert", "../src/thickness_demo.frag");
+	thickness_demo_shader.view_location = glGetUniformLocation(thickness_demo_shader.shader_program, "modelview");
+	thickness_demo_shader.projection_location = glGetUniformLocation(thickness_demo_shader.shader_program, "projection");
+	thickness_demo_shader.screen_size_location = glGetUniformLocation(thickness_demo_shader.shader_program, "screenSize");
+  thickness_demo_shader.radius_location = glGetUniformLocation(particle_shader.shader_program, "radius");
+  thickness_demo_shader.pos_location = glGetAttribLocation(thickness_demo_shader.shader_program, "pos");
+
+	glUseProgram(thickness_demo_shader.shader_program);
+
+	glUniformMatrix4fv(thickness_demo_shader.projection_location, 1, GL_FALSE, glm::value_ptr(camera.prsp));
+  glUniform2fv(thickness_demo_shader.screen_size_location, 1, glm::value_ptr(screensize));
+  glUniform1fv(thickness_demo_shader.radius_location, 1, &fluid_simulation.radius);
+
+  glBindFragDataLocation(thickness_demo_shader.shader_program, 0, "particle_width");
 
   //Liquid Shader
   liquid_shader.shader_program = LoadShader("../src/quad.vert", "../src/liquid.frag");
@@ -304,7 +366,7 @@ void init_background() {
 }
 
 void init() {
-  fluid_simulation.init_params(8, 1.0f, 3.0f, -15.0f, -15.0f, -15.0f, 30, 16);
+  fluid_simulation.init_params(16, 1.0f, 3.0f, -15.0f, -15.0f, -15.0f, 30, 16);
   fluid_simulation.init_test_particles();
   init_buffers();
   init_shaders();
@@ -323,134 +385,157 @@ void update_mouse_events() {
 void draw() {
   glBindVertexArray(VAO);
   //Get Surface
-  /*/
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
-
-  glUseProgram(depth_shader.shader_program);
-  glUniformMatrix4fv(depth_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
- 
-  //Bind Vertex Buffers
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer.VBO);
-  //glBufferData(GL_ARRAY_BUFFER, sizeof(fluid_simulation.vertices), fluid_simulation.vertices, GL_STREAM_DRAW);
-	glVertexAttribPointer(depth_shader.pos_location, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*) 0);	
-	glEnableVertexAttribArray(depth_shader.pos_location);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer.EBO);
-
-  glBindFramebuffer(GL_FRAMEBUFFER, depth_buffer.frame_buffers[0]);
-  //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //Clear framebuffer depth
-  GLfloat depth1 = 1.0f;
-  glClearBufferfv(GL_DEPTH, 0, &depth1);
-  //Clear framebuffer values 
-  GLfloat depth0 = 0.0f;
-  glClearBufferfv(GL_COLOR, 0, &depth0);
-
-  glDrawElements(GL_POINTS, fluid_simulation.num_points, GL_UNSIGNED_INT, (void *) 0);
-  
-  //Clearing Parameters
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glDisable(GL_DEPTH_TEST);
   //*/
-  //End Surface 
-
-  //Thickness
-  /*
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE); 
-  
-  glUseProgram(thickness_shader.shader_program);
-  glUniformMatrix4fv(thickness_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
-
-  glBindFramebuffer(GL_FRAMEBUFFER, thickness_buffer.frame_buffer);
-  //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //clear framebuffer values
-  GLfloat thick0 = 0.0f;
-  glClearBufferfv(GL_COLOR, 0, &thick0);
-
-  GLfloat thick1 = 1.0f;
-  glClearBufferfv(GL_DEPTH, 0, &thick1);
-
-  glDrawElements(GL_POINTS, fluid_simulation.num_points, GL_UNSIGNED_INT, (void *) 0);
-  
-  //Clearing Parameters 
-  glDisable(GL_BLEND);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //*/
-  //End Thickness
-  
-  //Curvature Smoothing
-  /*
-  glUseProgram(smoothing_shader.shader_program);
-
-  glBindBuffer(GL_ARRAY_BUFFER, screen_quad_buffer.VBO);
-  glVertexAttribPointer(smoothing_shader.pos_location, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*) 0);
-  glEnableVertexAttribArray(smoothing_shader.pos_location);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_quad_buffer.EBO);
-
-  glActiveTexture(GL_TEXTURE0);
-  glUniform1i(smoothing_shader.particle_depths_location, 0);
-  int ind = 0;
-  for (int i = 0; i < smoothing_iterations; i++) {
-    glBindFramebuffer(GL_FRAMEBUFFER, depth_buffer.frame_buffers[1 - ind]);
-    glBindTexture(GL_TEXTURE_2D, depth_buffer.textures[ind]);
+  if (depth || smoothed || thickness || fin) { 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
     
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
-    ind = 1 - ind;
+    if (depth || smoothed) {
+      glUseProgram(depth_demo_shader.shader_program);
+      glUniformMatrix4fv(depth_demo_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+    }
+    else {
+      glUseProgram(depth_shader.shader_program);
+      glUniformMatrix4fv(depth_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+    }
+ 
+    //Bind Vertex Buffers
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer.VBO);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(fluid_simulation.vertices), fluid_simulation.vertices, GL_STREAM_DRAW);
+	  glVertexAttribPointer(depth_shader.pos_location, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*) 0);	
+	  glEnableVertexAttribArray(depth_shader.pos_location);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer.EBO);
+    
+    if (depth)
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    else
+      glBindFramebuffer(GL_FRAMEBUFFER, depth_buffer.frame_buffers[0]);
+
+    //Clear framebuffer depth
+    GLfloat depth1 = 1.0f;
+    glClearBufferfv(GL_DEPTH, 0, &depth1);
+    //Clear framebuffer values 
+    if (!depth) {
+      GLfloat depth0 = 0.0f;
+      glClearBufferfv(GL_COLOR, 0, &depth0);
+    }
+    glDrawElements(GL_POINTS, fluid_simulation.num_points, GL_UNSIGNED_INT, (void *) 0);
+    
+    //Clearing Parameters
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_DEPTH_TEST);
+    //*/
+    //End Surface 
+    if (thickness || smoothed || fin) {
+      //Thickness
+      //*
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_ONE, GL_ONE); 
+      
+      if (thickness) {
+      glUseProgram(thickness_demo_shader.shader_program);
+      glUniformMatrix4fv(thickness_demo_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+      } else {
+      glUseProgram(thickness_shader.shader_program);
+      glUniformMatrix4fv(thickness_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+      }
+      if(thickness)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      else
+        glBindFramebuffer(GL_FRAMEBUFFER, thickness_buffer.frame_buffer);
+      //clear framebuffer values
+      if (!thickness) {
+      GLfloat thick0 = 0.0f;
+      glClearBufferfv(GL_COLOR, 0, &thick0);
+      }
+      GLfloat thick1 = 1.0f;
+      glClearBufferfv(GL_DEPTH, 0, &thick1);
+
+      glDrawElements(GL_POINTS, fluid_simulation.num_points, GL_UNSIGNED_INT, (void *) 0);
+      
+      //Clearing Parameters 
+      glDisable(GL_BLEND);
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      //*/
+      //End Thickness
+      if (smoothed || fin) {  
+        //Curvature Smoothing
+        //*
+        glUseProgram(smoothing_shader.shader_program);
+
+        glBindBuffer(GL_ARRAY_BUFFER, screen_quad_buffer.VBO);
+        glVertexAttribPointer(smoothing_shader.pos_location, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*) 0);
+        glEnableVertexAttribArray(smoothing_shader.pos_location);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screen_quad_buffer.EBO);
+
+        glActiveTexture(GL_TEXTURE0);
+        glUniform1i(smoothing_shader.particle_depths_location, 0);
+        int ind = 0;
+        for (int i = 0; i < smoothing_iterations; i++) {
+          glBindFramebuffer(GL_FRAMEBUFFER, depth_buffer.frame_buffers[1 - ind]);
+          glBindTexture(GL_TEXTURE_2D, depth_buffer.textures[ind]);
+          
+          glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
+          ind = 1 - ind;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, depth_buffer.textures[0]);
+        glUniform1i(smoothing_shader.particle_depths_location, 0);
+        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
+        //*/
+        if(fin) {
+          //Render liquid quad
+          //*
+          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+          glUseProgram(liquid_shader.shader_program);
+          glUniformMatrix4fv(liquid_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+
+          glActiveTexture(GL_TEXTURE0);
+          glBindTexture(GL_TEXTURE_2D, depth_buffer.textures[ind]);
+          glUniform1i(liquid_shader.particle_depths_location, 0);
+
+          glActiveTexture(GL_TEXTURE1);
+          glBindTexture(GL_TEXTURE_2D, thickness_buffer.texture);
+          glUniform1i(liquid_shader.thickness_location, 1);
+
+	        glActiveTexture(GL_TEXTURE2);
+	        glBindTexture(GL_TEXTURE_2D, background);
+	        glUniform1i(liquid_shader.background_location, 2);
+           
+          glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+          glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
+
+          glBindBuffer(GL_ARRAY_BUFFER, 0);
+          glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
+      }
+    }
   }
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glBindTexture(GL_TEXTURE_2D, depth_buffer.textures[0]);
-  glUniform1i(smoothing_shader.particle_depths_location, 0);
-  
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
-  
-  //*/
-
-  //Render liquid quad
-  /*
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  glUseProgram(liquid_shader.shader_program);
-  glUniformMatrix4fv(liquid_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, depth_buffer.textures[ind]);
-  glUniform1i(liquid_shader.particle_depths_location, 0);
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, thickness_buffer.texture);
-  glUniform1i(liquid_shader.thickness_location, 1);
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, background);
-	glUniform1i(liquid_shader.background_location, 2);
-   
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   //*/
   //Sprite Shader
   //*
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
-  
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glUseProgram(particle_shader.shader_program);
+  if (point_sprite) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glUseProgram(particle_shader.shader_program);
 
-	glUniformMatrix4fv(particle_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
+	  glUniformMatrix4fv(particle_shader.view_location, 1, GL_FALSE, glm::value_ptr(camera.look_at));
 
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer.VBO);
-	glVertexAttribPointer(particle_shader.pos_location, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*) 0);	
-	glEnableVertexAttribArray(particle_shader.pos_location);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer.EBO);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer.VBO);
+	  glVertexAttribPointer(particle_shader.pos_location, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*) 0);	
+	  glEnableVertexAttribArray(particle_shader.pos_location);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer.EBO);
 
-  glDrawArrays(GL_POINTS,0,fluid_simulation.num_points);
+    glDrawArrays(GL_POINTS,0,fluid_simulation.num_points);
+  }
   //*/
   glBindVertexArray(0);
   glfwSwapBuffers(window);
@@ -460,6 +545,37 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+      fin = true;
+      thickness = false;
+      point_sprite = false;
+      depth = false;
+      smoothed = false;
+    } else if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+      fin = false;
+      thickness = false;
+      point_sprite = false;
+      depth = true;
+      smoothed = false;
+    } else if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+      fin = false;
+      thickness = false;
+      point_sprite = false;
+      depth = false;
+      smoothed = true;
+    } else if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
+      fin = false;
+      thickness = true;
+      point_sprite = false;
+      depth = false;
+      smoothed = false;
+    } else if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
+      fin = false;
+      thickness = false;
+      point_sprite = true;
+      depth = false;
+      smoothed = false;
+    }
 }
 
 void mouse_callback(GLFWwindow* window, int button, int action, int mods)

@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+<title>CS 184 Final Project</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Roboto', sans-serif; 
+  }
+  img, svg{
+    width: 100%;
+  } 
+  h1, h2 {font-weight:bolder;}
+  p {font-size:14pt;}
+  .row {width:90%; margin-left:5%;}
+</style>
+</head>
+
+<body>
+
+
+<div class="container" style="margin-top:50px;">
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded" style="margin-bottom:60px">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">FluidFlow</a>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="index.html">Proposal</a>
+      <a class="nav-item nav-link active" href="milestone.html">Milestone<span class="sr-only">(current)</span></a>
+      <a class="nav-item nav-link active" href="final.html">Milestone</a>
+    </div>
+  </div>
+</nav>
+
+  <div class="row"  style="margin-bottom:25px;">
+    <div class="col-md-12" style="margin-bottom:10px;">
+      <h2>Final Report</h2>
+      <h5>May 5, 2017</h5>
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom:50px;">
+    <div class="col-md-7" style="margin-top:20px;">
+      <h3>Overview</h3>
+      <p>To begin, I'd like to say that the original goal was not reached, but we made significant progress. The video to the right shows the current capabilities of our simulator and renderer. The original goal was to render and simulate multiple fluids of different densities to demonstrate Taylor-Rayleigh effects. Unfortunately, creating the renderer took longer than expected. As such, the simulator is currently only able to simulate and render a single fluid. However, we were able to get the particle simulation working as well as the renderer. </p>
+      <p>As I hinted at in the last paragraph, the fluid simulator is composed of two parts: the particle simulator and the renderer. The particle simulator updates the vertex positions of all the particles in each iteration. This updating process occurs in the GPU using OpenCL and applies gravity and enforces density constraints on the particles to simulate the movement of a fluid. The renderer takes the positions of the particles and generates the visual appearance of the fluid using OpenGL. I will first discuss how the particle simulator works and then I will go over the renderer.</p>
+    </div>
+    <div class="col-md-5 text-center" style="margin-top:50px">
+      <div style="width:400px;height:450px;overflow:hidden;">
+      <video width="1000px" autoplay loop style="margin-left:-300px;margin-top:-130px;">
+        <source src="images/final/cube_fluid_32k.webm" type="video/webm">
+      </video>
+      </div>
+      <p style="font-size:12px">Rendering with 32k particles.</p>
+    </div>
+  </div>
+
+  <div class="row" style"margin-bottom:25px;">
+    <div class="col-md-12" style="margin-bottom:20px;">
+      <h3>Particle Simulator</h3>
+      <p>The particle simulator goes through four phases in the following order: applying gravity and predicting positions/velocity; finding neighbors; enforcing fluid density constraints; finding and fixing particle collisions.</p>
+    </div>
+    <div class="col-md-12">
+      <h4>1. Gravity and Position/Velocity Prediction</h4>
+      <p>This first part is fairly simple. The velocity and position of each particle are updated according to the two equations below.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:30px;">
+      <img src="images/final/predict.png"  style="width:200px;">
+    </div>
+    <div class="col-md-12">
+      <h4>2. Neighbors</h4>
+    </div>
+    <div class="col-md-5 text-center" style="margin-top:20px">
+      <div style="width:300px;height:400px;overflow:hidden; margin-left:45px;">
+      <video width="1300px" autoplay loop style="margin-left:-490px;margin-top:-300px;">
+        <source src="images/final/cube_neighbor_4k.webm" type="video/webm">
+      </video>
+      </div>
+      <p style="font-size:12px; margin-top:20px;">Visualization of grid assignments. Particles with the same color are assigned to the same grid.</p>
+    </div>
+    <div class="col-md-7">
+      <p>After predicting the particles' updated positions, the next step in the simulation is to find neighbors for each particle. This is done according to the paper <i>Cuda Particles</i> (Green 2008) by creating uniform grids across the scene. Each grid is assigned an ID and each particle is assigned to a grid based on its location in space. The grids used were cubes with a side length equal to twice a particle's diameter.</p>
+      <p>Once each particle is assigned a grid, the array of assigned ID's is radix sorted to make the operation of finding neighbors faster. Once these ID's are sorted, the starting index in the ID array for each contiguous block of similar grid ID's is recorded. These indices mark where to find, in the array, the particles that belong to a particular grid. The ID's have a one to one relationship with each grid, making it simple to find a particle's neighbors.</p>
+      <p>The neighbors are used to perform localized computations in the next sections. However, since particle's can be found on the boundary, a 3x3 block of grids with the particle's assigned grid at the center must be searched for neighboring particles.</p>
+    </div>
+  </div>
+
+  <div class="row" style"margin-bottom:25px;">
+    <div class="col-md-12">
+      <h4>3. Enforcing Fluid Density</h4>
+      <p>In order to give the particles a fluid-like motion, the simulator enforces a group of density constraints (Macklin and M&uuml;ller 2013) shown below. N is the number of particles in the simulation and <i>j</i> indexes a particle's neighbors.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:20px;">
+      <img src="images/final/density.png"  style="width:200px;">
+    </div>
+    <div class="col-md-12">
+      <p>The constraint states that the density of a group of particles centered about particle <i>i</i> must have a density &rho;<sub>i</sub> equal to that of the rest density &rho;<sub>0</sub>. The dynamic density &rho;<sub>i</sub> is calculated in the following way.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:20px;">
+      <img src="images/final/dynamic_density.png"  style="width:200px;">
+    </div>
+    <div class="col-md-12">
+      <p><i>W</i> is a smoothing kernel which helps to fill in the gaps between the particles. In this case, the poly6 kernel is used (Macklin and M&uuml;ller 2013). <i>h</i> is the maximum distance between a particle and its neighbor and was set to twice the diameter of a particle in this case.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:20px;">
+      <img src="images/final/poly6.png"  style="width:200px;">
+    </div>
+    <div class="col-md-12">
+      <p>In order to enforce the density constraint, Jacobi iterations are used to solve for &Delta;<b>p</b><sub>i</sub>, a correction factor for the position of particle <i>i</i>. </p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:20px;">
+      <img src="images/final/correction.png"  style="width:200px;">
+    </div>
+    <div class="col-md-12">
+      <p>The correction factor is obtained by calculating the following &lambda; term and then using it in the subsequent equation.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:20px;">
+      <img src="images/final/lambda.png"  style="width:200px;">
+      <br>
+      <img src="images/final/constraint_grad.png"  style="width:300px;">
+      <br>
+      <br>
+      <img src="images/final/dp.png"  style="width:300px;">
+    </div>
+    <div class="col-md-12">
+      <p>The &epsilon; term in the denominator for the calculation of &lambda;<sub>i</sub> is a relaxation constant that is used to remove instabilities when the gradients approach 0. In this case, <i>W</i> is the Spiky kernel, which is used because its gradient does not go to 0 when <b>r</b> goes to 0, unlike the Poly6 kernel.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:20px;">
+      <img src="images/final/grad_spiky.png"  style="width:250px;">
+    </div>
+    <div class="col-md-12" style="margin-bottom:25px;">
+      <p>This process of finding the &lambda; terms and updating the positions is repeated for a number of iterations, 5 in this case, to get as close to an optimal solution as possible.</p>
+    </div>
+  </div>
+
+  <div class="row" style"margin-bottom:25px;">
+    <div class="col-md-10">
+      <h4>4. Finding and Fixing Collisions</h4>
+      <p>In each iteration of calculating the position corrections, collisions between particles are also found and fixed. For each particle, a search through the neighbors is found for any intersecting particles. Colliding particles are simply moved along a line connecting their centers until they are no longer colliding.</p>
+    </div>
+    <div class="col-md-2 text-center">
+      <img src="images/final/collision.png">
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom:50px;">
+    <div class="col-md-12" style>
+      <p>Once the above steps are done, one frame of the simulation is then rendered using the process which will be explained below. Unfortunately, viscosity and vorticity were not enforced in the simulator as the code which calculated those corrections were too slow on the Macbook and would crash the program.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12" style="margin-bottom:20px;">
+      <h3>Rendering</h3>
+      <p>The rendering pipeline can also be broken down into four steps. First, the particles are rendered as point sprites, which are used to calculate a depth map. This depth map is then smoothed to create a more liquid-like appearance. A thickness map is calculated of the amount of liquid present at each point in the screen. These values are then finally combined to produce the color of the final liquid.</p>
+    </div>
+    <div class="col-md-6">
+      <h4>1. Point Sprites and Depth Map</h4>
+      <p>First, each of the particles positions are passed to a vertex shader. This vertex shader converts the particle's positions from world space to screen space. In doing so, it also generates rectangles around each point using the OpenGL built in point-sprite rendering option, passing these fragments to the fragment shader.</p>
+      <p>The fragment shader takes the rectangles and shapes them into spheres, discarding points outside the sphere and calculating the points' z coordinates in screen space depending on their distances from the original particle position.</p>
+      <p>These z positions, or the depths of the points are output from the fragment shader. Depth test is enabled, so only the values closest to the screen are retained. Essentially, this creates a depth map of the surface of the fluid that is visible to the camera</p>
+    </div>
+    <div class="col-md-3 text-center" style="margin-top:50px">
+      <div style="width:220px;height:450px;overflow:hidden;">
+      <video width="500px" autoplay loop style="margin-left:-140px;margin-top:-10px;">
+        <source src="images/final/cube_point_32k.webm" type="video/webm">
+      </video>
+      </div>
+      <p style="font-size:12px;margin-top:-70px;">Visualization of what the point sprites would look like if rendered as spheres.</p>
+    </div>
+    <div class="col-md-3 text-center" style="margin-top:50px">
+      <div style="width:220px;height:450px;overflow:hidden;">
+      <video width="500px" autoplay loop style="margin-left:-140px;margin-top:-10px;">
+        <source src="images/final/cube_depth_32k.webm" type="video/webm">
+      </video>
+      </div>
+      <p style="font-size:12px;margin-top:-70px;">Visualization of the depth map with 32k particles. Brighter colors are further from the screen.</p>
+    </div>
+
+    <div class="col-md-12" style="margin-top:25px;">
+      <h4>2. Curvature Smoothing</h4>
+    </div>
+    <div class="col-md-5 text-center" style="margin-top:20px">
+      <div style="width:360px;height:330px;overflow:hidden; margin-left:10px;">
+      <video width="800px" autoplay loop style="margin-left:-220px;margin-top:-140px;">
+        <source src="images/final/cube_smoothed_depth_32k.webm" type="video/webm">
+      </video>
+      </div>
+      <p style="font-size:12px; margin-top:20px;">Visualization of the smoothed depth map. Brighter colors are farther away.</p>
+    </div>
+    <div class="col-md-7">
+      <p>The next step is to remove the bumpiness of the spheres in the depth map. This is done with a process called curvature smoothing. To do this, the algorithm uses several "smoothing time-steps" (van der Laan, et al. 2009). In each smoothing step, the algorithm updates the depth, <i>z</i>, according to:</p>
+      <div class="text-center">
+      <img src="images/final/time-step.png" style="width:80px;">
+      </div>
+      <p><i>H</i> is the mean curvature flow and is calculated with:</p>
+      <div class="text-center">
+      <img src="images/final/H.png" style="width:180px;">
+      </div>
+      <p><img src="images/final/unit_n.png" style="width:30px;margin-bottom:7px;margin-right:-5px; margin-left:-5px;"> is the unit normal of the surface at a certain point. The depth value is then smoothed by using an Euler integration of the change in <i>z</i> with respect to the time step.</p>
+    </div>
+
+    <div class="col-md-12" style="margin-top:25px;">
+      <h4>3. Thickness</h4>
+    </div>
+    <div class="col-md-9">
+      <p>The next step is to get the thickness of the liquids at all the points on the screen. This is done by rendering the particles as point sprites again. However, the fragment shader calculates and outputs the chord length of the sphere based on the distance from the center of the point sprite. These thicknesses are then summed up using the OpenGL blend function.</p>
+    </div>
+    <div class="col-md-3 text-center" style="margin-top:-40px">
+      <div style="width:200px;height:150px;overflow:hidden; margin-left:10px;">
+      <video width="400px" autoplay loop style="margin-left:-100px;margin-top:-80px;">
+        <source src="images/final/cube_thickness_32k.webm" type="video/webm">
+      </video>
+      </div>
+      <p style="font-size:12px; margin-top:10px;">Visualization of the thickness of the fluid. Brighter colors are thicker regions.</p>
+    </div>
+
+    <div class="col-md-12">
+      <h4>4. Liquid Rendering</h4>
+      <p>The final liquid is rendered using the final equation at each point on the screen.</p>
+    </div>
+    <div class="col-md-12 text-center" style="margin-bottom:15px;">
+      <img src="images/final/fresnel.png" style="width:500px;">
+    </div>
+    <div class="col-md-12" style="margin-bottom:30px;">
+      <p><i>T(x, y)</i> is the thickness of the fluid at a certain point on the screen. <i>S(x, y)</i> is the scene color at a certain point on the screen. <i>F</i> is the fresnel equation. <b>n</b> is the surface normal. <b>v</b> is the camera vector from the point on the screen to the camera position. <b>h</b> is the half angle between the normal vector and the camera vector.</p>
+    </div>
+  </div>  
+
+  <div class="row" style="margin-bottom:50px;">
+    <div class="col-md-12 text-center">
+      <h3>Rendered Demos</h3>
+      <div style="width:100%;height:500px;overflow:hidden;margin-top:25px;">
+      <video width="150%" autoplay loop style="margin-left:-300px;margin-top:-370px;">
+        <source src="images/final/rectangle_fluid_32k.webm" type="video/webm">
+      </video>
+      </div>
+
+      <div style="width:100%;height:600px;overflow:hidden;margin-top:25px;">
+      <video width="150%" autoplay loop style="margin-left:-250px;margin-top:-330px;">
+        <source src="images/final/rectangle_bigger_fluid_32k.webm" type="video/webm">
+      </video>
+      </div>
+
+      <div style="width:100%;height:600px;overflow:hidden;margin-top:25px;">
+      <video width="150%" autoplay loop style="margin-left:-230px;margin-top:-200px;">
+        <source src="images/final/two_rectangles_32k.webm" type="video/webm">
+      </video>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Works Cited</h3>
+        <p>Van der Laan, Wladimir J., Simon Green, and Miguel Sainz. "Screen space fluid rendering with curvature flow." Proceedings of the 2009 symposium on Interactive 3D graphics and games. ACM, 2009.</p>
+        
+        <p>Green, Simon. "Cuda particles." NVIDIA whitepaper 2.3.2 (2008): 1.</p>
+        
+        <p>Macklin, Miles, and Matthias Müller. "Position based fluids." ACM Transactions on Graphics (TOG) 32.4 (2013): 104.</p>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h3>Contributions</h3>
+        <p>I, Jiayi (Gary) Chen, built the entire renderer as well as the particle simulator. I also created the entire website for the project (the proposal, milestone, and final report) and wrote all of the content. In addition, I edited the videos for both the milestone and final and narrated the entire final video. I also created all of the demos and rendered them all on my laptop. Finally, I created the slides for the milestone and half of the slides for the final presentation. Writing the code and rendering the demos took about 2 weeks of work. The final writeup took a day to write.</p>
+        <p>Kevin wrote viscosity and vorticity confinement code, which could not be implemented into the code (for reasons mentioned above). This took 3 days. He also wrote half of the proposal content, which was an afternoon of work. Kevin also created half of the slides for the final presentation, which took half an hour.</p>
+        <p>I would like to register a complaint about Kevin's lack of contribution to the project. We had originally agreed to split the work in half. I would write the renderer and he would write the particle simulator. We also agreed that I would write it in OpenGL and he would use OpenCL. However, he had not written any usable code for the particle simulator by the milestone. As such, I ended up having to take over his part of the work and write the particle simulator. Furthermore, he contacted me only two hours before the deadline for the final report to work on it and didn't realize that we needed to create a final report. I had to spend the entire week finishing up this project and have not been able to start studying for my final exams yet.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

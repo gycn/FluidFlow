@@ -34,9 +34,8 @@
   <a class="navbar-brand" href="#">FluidFlow</a>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" href="index.html">Proposal</a>
-      <a class="nav-item nav-link active" href="milestone.html">Milestone<span class="sr-only">(current)</span></a>
-      <a class="nav-item nav-link active" href="final.html">Milestone</a>
+      <a class="nav-item nav-link" href="milestone.html">Milestone</a>
+      <a class="nav-item nav-link active" href="final.html">Final</a>
     </div>
   </div>
 </nav>
@@ -51,8 +50,7 @@
   <div class="row" style="margin-bottom:50px;">
     <div class="col-md-7" style="margin-top:20px;">
       <h3>Overview</h3>
-      <p>To begin, I'd like to say that the original goal was not reached, but we made significant progress. The video to the right shows the current capabilities of our simulator and renderer. The original goal was to render and simulate multiple fluids of different densities to demonstrate Taylor-Rayleigh effects. Unfortunately, creating the renderer took longer than expected. As such, the simulator is currently only able to simulate and render a single fluid. However, we were able to get the particle simulation working as well as the renderer. </p>
-      <p>As I hinted at in the last paragraph, the fluid simulator is composed of two parts: the particle simulator and the renderer. The particle simulator updates the vertex positions of all the particles in each iteration. This updating process occurs in the GPU using OpenCL and applies gravity and enforces density constraints on the particles to simulate the movement of a fluid. The renderer takes the positions of the particles and generates the visual appearance of the fluid using OpenGL. I will first discuss how the particle simulator works and then I will go over the renderer.</p>
+      <p>The video to the right shows the current capabilities of the fluid simulator. The fluid simulator is composed of two parts: the particle simulator and the renderer. The particle simulator updates the vertex positions of all the particles in each iteration. This updating process occurs in the GPU using OpenCL and applies gravity and enforces density constraints on the particles to simulate the movement of a fluid. The renderer takes the positions of the particles and generates the visual appearance of the fluid using OpenGL. </p>
     </div>
     <div class="col-md-5 text-center" style="margin-top:50px">
       <div style="width:400px;height:450px;overflow:hidden;">
@@ -154,7 +152,7 @@
 
   <div class="row" style="margin-bottom:50px;">
     <div class="col-md-12" style>
-      <p>Once the above steps are done, one frame of the simulation is then rendered using the process which will be explained below. Unfortunately, viscosity and vorticity were not enforced in the simulator as the code which calculated those corrections were too slow on the Macbook and would crash the program.</p>
+      <p>Once the above steps are done, one frame of the simulation is then rendered using the process which will be explained below. </p>
     </div>
   </div>
 
@@ -271,14 +269,6 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-12">
-      <h3>Contributions</h3>
-        <p>I, Jiayi (Gary) Chen, built the entire renderer as well as the particle simulator. I also created the entire website for the project (the proposal, milestone, and final report) and wrote all of the content. In addition, I edited the videos for both the milestone and final and narrated the entire final video. I also created all of the demos and rendered them all on my laptop. Finally, I created the slides for the milestone and half of the slides for the final presentation. Writing the code and rendering the demos took about 2 weeks of work. The final writeup took a day to write.</p>
-        <p>Kevin wrote viscosity and vorticity confinement code, which could not be implemented into the code (for reasons mentioned above). This took 3 days. He also wrote half of the proposal content, which was an afternoon of work. Kevin also created half of the slides for the final presentation, which took half an hour.</p>
-        <p>I would like to register a complaint about Kevin's lack of contribution to the project. We had originally agreed to split the work in half. I would write the renderer and he would write the particle simulator. We also agreed that I would write it in OpenGL and he would use OpenCL. However, he had not written any usable code for the particle simulator by the milestone. As such, I ended up having to take over his part of the work and write the particle simulator. Furthermore, he contacted me only two hours before the deadline for the final report to work on it and didn't realize that we needed to create a final report. I had to spend the entire week finishing up this project and have not been able to start studying for my final exams yet.</p>
-    </div>
-  </div>
 </div>
 
 </body>

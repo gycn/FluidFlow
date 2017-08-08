@@ -34,8 +34,8 @@
   <a class="navbar-brand" href="#">FluidFlow</a>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" href="index.html">Proposal</a>
       <a class="nav-item nav-link active" href="milestone.html">Milestone</a>
+      <a class="nav-item nav-link" href="final.html">Final</a>
     </div>
   </div>
 </nav>
@@ -48,13 +48,13 @@
 
     <div class="col-md-7" style="margin-top:20px;">
       <h4 style="font-weight:bold">Rendering</h4>
-      <p>The image on the right is the amount of progress that we have made on our fluid renderer so far. All of the code was written in C++ on the OpenGL pipeline.</p>  <p>As seen, the rendering almost resembles a real liquid. However, there are still artificats and the spherical shapes have not been completely eliminated.</p>
+      <p>The image on the right is the amount of progress that has been made on the renderer. All of the code was written in C++ on the OpenGL pipeline.</p>  <p>As seen, the rendering almost resembles a real liquid. However, there are still artificats and the spherical shapes have not been completely eliminated.</p>
     </div>
     <div class="col-md-5">
       <img src="images/milestone/liquid_120.png">
     </div>
     <div class="col-md-12">
-      <p>Below, we give more details on the process of rendering the fluids. </p>
+      <p>Below are more details on the process of rendering the fluids. </p>
     </div>
   </div>
 
@@ -128,7 +128,7 @@
       <h4 style="font-weight:bold;">Simulation</h4>
     </div>
     <div class="col-md-8">
-      <p>Unfortunately, we have not made much progress on the actual simulation of the particles. Currently, we have been able to link OpenCL with OpenGL and get gravity working, as seen on the right. We have also written some code for enforcing incompressibility (which will be shown in the video), but it is still buggy.</p>
+      <p>Unfortunately, not much progress has been made on the actual simulation of the particles. Currently, OpenCL has been linked with OpenGL and gravity is working, as seen on the right. Also, some code for enforcing incompressibility (which will be shown in the video), but it is still buggy.</p>
     </div>
    <div class="col-md-4">
     <video width="221" height="360" autoplay loop style="padding-bottom:120px">
@@ -142,8 +142,7 @@
       <h2>Thoughts and Updates</h2>
     </div>
     <div class="col-md-12">
-      <p>We are definitely behind schedule. We had planned to have a working particle simulation for one fluid by now as well as a working basic renderer. We don't have either right now. As a result, we are going to have to skip some things that we had wanted to include. Currently, we are planning not to integrate the particle anisotropy calculation and instead rely on curvature smoothing. In addition, we will probably not implement interaction between fluids and solids.</p>
-      <p>Our goals for this week are to finish up debugging the renderer and get the particle simulation working with a single fluid. Next week, we will include additional liquids.</p>
+      <p>The project is definitely behind schedule. It was planned to have a working particle simulation for one fluid by now as well as a working basic renderer. Neither is done right now. As a result, some reach goals will have to be skipped. Currently, the plan is to not integrate the particle anisotropy calculation and instead rely on curvature smoothing. </p>
     </div>
   </div>
   
@@ -158,7 +157,6 @@
 
   <div class="row" style="margin-top:30px;margin-bottom:50px;">
     <div class="col-md-12 text-center">
-      <h3>Slides giving an overview of the project can be found <a href="https://docs.google.com/presentation/d/1oQh7cit-GprhBtPv8hi3jjqBrH3QKnw-Mlz1Uu8Vg1I/edit?usp=sharing">here</a>.</h3>
     </div>
   </div>
 
